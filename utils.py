@@ -220,7 +220,7 @@ async def process_raid_message(bot, message) -> None:
     
     
 async def process_message(bot: interactions.Client, message: interactions.message.Message) -> None:
-    print(message)
+    print(type(message), message)
     time1 = time.time()
     try:
         embeds = message.embeds
