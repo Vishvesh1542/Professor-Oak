@@ -221,14 +221,18 @@ async def process_raid_message(bot, message) -> None:
     
 async def process_message(bot: interactions.Client, message: interactions.message.Message) -> None:
     print(message)
-    embeds = message.embeds
+    time1 = time.time()
+    try:
+        embeds = message.embeds
 
-    if embeds != [] and embeds != None:
-        if embeds[0].title == '⚔️ Raid Announcement ⚔️':
-            await process_raid_message(bot, message)
-        elif  embeds[0].title == "A wild pokémon has аppeаred!":
-            channel = await message.get_channel()
-            await channel.send(embeds=await name_pokemon.name_pokemon(embeds[0].image.url))
+        if embeds != [] and embeds != None:
+            if embeds[0].title == '⚔️ Raid Announcement ⚔️':
+                await process_raid_message(bot, message)
+            elif  embeds[0].title == "A wild pokémon has аppeаred!":
+                channel = await message.get_channel()
+                await channel.send(embeds=await name_pokemon.name_pokemon(embeds[0].image.url))
+    except: pass
+    print(f'Process time: {time.time() - time1}' )
 
 
 async def search_raids(ctx, bot: interactions.Client) -> interactions.Embed:
