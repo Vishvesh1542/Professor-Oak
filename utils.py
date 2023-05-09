@@ -220,7 +220,6 @@ async def process_raid_message(bot, message) -> None:
     
     
 async def process_message(bot: interactions.Client, message: interactions.message.Message) -> None:
-    raid_class.update()
     embeds = message.embeds
 
     if embeds != [] and embeds != None:
@@ -233,6 +232,7 @@ async def process_message(bot: interactions.Client, message: interactions.messag
 
 
 async def search_raids(ctx, bot: interactions.Client) -> interactions.Embed:
+    raid_class.update()
     embed = interactions.Embed(title='Current Raids: ')
     embed.color = 0x3F704D
 
