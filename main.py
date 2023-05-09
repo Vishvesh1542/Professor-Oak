@@ -3,10 +3,6 @@ import utils
 import raids
 import name_pokemon
 
-
-with open('token') as token:
-    token = str(token.read())
-
 intents = interactions.Intents.ALL
 
 bot = interactions.Client(token="OTcxMzQyNzEwNzI2MzQ4ODEw.G3Fg_k.h8XCYekp1JGZt-moiJ4VWwaYMF0Hlko2GNJKb4",
