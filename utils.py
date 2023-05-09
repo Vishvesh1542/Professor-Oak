@@ -33,12 +33,15 @@ class AsyncList:
 
 
 def init_files() -> None:
-    global raid_pokemon, pokemon_list
+    global raid_pokemon, pokemon_list, public_servers
     with open(os.getcwd() + '/data/pokemon_list') as file:
         pokemon_list = json.load(file)
 
     with open(os.getcwd() + '/data/raid_pokemon') as file:
         raid_pokemon = eval(file.read())
+
+    with open(os.getcwd() + '/data/public_servers') as file:
+        public_servers = eval(file.read())
 
     print('(re)loaded common files ')
 
@@ -188,8 +191,6 @@ async def get_raid_pokemon(ctx, _input: str) -> interactions.Embed:
 
 
 async def process_raid_message(bot, message) -> None:
-    with open(os.getcwd() + '/data/public_servers') as f:
-        public_servers = eval(f.read())
 
     if message.guild_ids in public_servers:
         embed = message.embeds
@@ -242,6 +243,7 @@ async def search_raids(ctx, bot: interactions.Client) -> interactions.Embed:
 
     try:
         max_length = max([len(x[0]) for x in list(list_of_raid_pokemon.values())])
+
     except Exception:
         max_length = 1
 
@@ -251,15 +253,15 @@ async def search_raids(ctx, bot: interactions.Client) -> interactions.Embed:
         try:
             guild_name = await bot._http.get_guild(int(guild))
             guild_name = guild_name['name']
-            raid_boss = lst[0]
+            raid_boss = lst['boss']
             if raid_boss == '?':
                 raid_boss = 'Yet to hatch'
 
-            seconds = lst[2] - time.time() + lst[1] - 30 # (For some reason this is needed)
+            seconds = lst['time_left'] - time.time() + lst['start_time']
             m, s = divmod(seconds, 60)
             h, m = divmod(m, 60)
 
-            embed.add_field(name=f"{guild_name} , id: {lst[4]}, star: {lst[3]} ", value=f'```{raid_boss.ljust(max_length)} | Hr: {int(h)} Min: {int(m)} Sec: {int(s)}```')
+            embed.add_field(name=f"{guild_name} , id: {lst['id']}, star: {lst['stars']} ", value=f'```{raid_boss.ljust(max_length)} | Hr: {int(h)} Min: {int(m)} Sec: {int(s)}```')
         except Exception:
             pass
     embed.set_footer('Showing only the first 15 raids')
@@ -267,10 +269,6 @@ async def search_raids(ctx, bot: interactions.Client) -> interactions.Embed:
 
 
 async def toggle_public_server(ctx, bot: interactions.Client) -> str:
-
-    public_servers = []
-    with open(os.getcwd() + '/data/public_servers') as file:
-        public_servers = eval(file.read())
 
     sender_id = ctx.user.id
     guild_id = int(ctx.guild_id)
@@ -285,20 +283,22 @@ async def toggle_public_server(ctx, bot: interactions.Client) -> str:
         public_servers.append(guild_id)
         with open(os.getcwd() + '/data/public_servers', 'w') as file:
             file.write(str(public_servers))
+
         return 'Successfully made this server public. \n (changes will take place from next raid)'#'Successfully hid this server. \n (changes will take place from next raid)'
 
     else:
         public_servers.remove(guild_id)
         with open(os.getcwd() + '/data/public_servers', 'w') as file:
             file.write(str(public_servers))
+
         return 'Successfully hid this server. \n (changes will take place from next raid)'
 
-
+   
 def get_server_id(raid_id):
     raids = raid_class.get()
     for key, list_ in list(raids.items()):
-        if list_[4] != '-':
-            if int(list_[4]) == int(raid_id):
+        if list_['id'] != '-':
+            if int(list_['id']) == int(raid_id):
                 return key
         
     print('x')        
