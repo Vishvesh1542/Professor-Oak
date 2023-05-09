@@ -4,12 +4,7 @@ import raids
 import name_pokemon
 
 
-with open('token') as token:
-    token = str(token.read())
-
-intents = interactions.Intents.ALL
-
-bot = interactions.Client(token="OTcxMzQyNzEwNzI2MzQ4ODEw.G3Fg_k.h8XCYekp1JGZt-moiJ4VWwaYMF0Hlko2GNJKb4",
+bot = interactions.Client(token="token",
                           intents=interactions.Intents.ALL)
 
 
@@ -91,7 +86,6 @@ async def test(ctx: interactions.CommandContext):
 @bot.event(name='on_message_create')
 async def on_message(message: interactions.message.Message):
     await utils.process_message(bot, message)
-    print('processed message')
 
 
 @bot.command(
