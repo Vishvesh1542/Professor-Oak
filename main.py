@@ -70,11 +70,28 @@ async def cmd(ctx: interactions.CommandContext, sub_command: str, pokemon: str =
         await ctx.send(embeds=await utils.search_raids(ctx, bot))
     elif sub_command == 'server_join':
         await ctx.send(await utils.get_server_link(bot=bot, id_=raid_id, ctx=ctx), ephemeral=True)
+        
+
+@bot.command(
+    name='test',
+    description='If u can see this u are hacking',
+    scope=1084731374344359966,
+)
+async def test(ctx: interactions.CommandContext):
+    embed = interactions.Embed(title='⚔️ Raid Announcement ⚔️')
+    embed.description = "Hello trainers ! A new raid will start in 5 minutes. Here are the details about the raid.\n \
+**Raid Boss :** Alolan Vulpix\n \
+**Raid Stars :** ⭐⭐\n \
+**Raid ID :** 35\n \
+**Start Time :** May 9, 2023 11:55 AM UTC"
+    await ctx.send(embeds=embed)
+
 
 
 @bot.event(name='on_message_create')
 async def on_message(message: interactions.message.Message):
     await utils.process_message(bot, message)
+    print('processed message')
 
 
 @bot.command(
