@@ -39,26 +39,26 @@ bot = interactions.Client(token="OTcxMzQyNzEwNzI2MzQ4ODEw.G3Fg_k.h8XCYekp1JGZt-m
             type=interactions.OptionType.SUB_COMMAND,
         ),
 
-        # # Raid search
-        # interactions.Option(
-        #     name="search",
-        #     description="Show all the on-going raids!",
-        #     type=interactions.OptionType.SUB_COMMAND,
-        # ),
-        # # Raid joins
-        # interactions.Option(
-        #     name="server_join",
-        #     description="Show all the on-going raids!",
-        #     type=interactions.OptionType.SUB_COMMAND,
-        #     options=[
-        #         interactions.Option(
-        #             name='raid_id',
-        #             description='The ID of the raid you want to join.',
-        #             type=interactions.OptionType.INTEGER,
-        #             required=True
-        #         )
-        #     ]
-        # ),
+        # Raid search
+        interactions.Option(
+            name="search",
+            description="Show all the on-going raids!",
+            type=interactions.OptionType.SUB_COMMAND,
+        ),
+        # Raid joins
+        interactions.Option(
+            name="server_join",
+            description="Show all the on-going raids!",
+            type=interactions.OptionType.SUB_COMMAND,
+            options=[
+                interactions.Option(
+                    name='raid_id',
+                    description='The ID of the raid you want to join.',
+                    type=interactions.OptionType.INTEGER,
+                    required=True
+                )
+            ]
+        ),
     ],
 )
 async def cmd(ctx: interactions.CommandContext, sub_command: str, pokemon: str = "", raid_id: int = 0):
@@ -66,10 +66,10 @@ async def cmd(ctx: interactions.CommandContext, sub_command: str, pokemon: str =
         await ctx.send(embeds=await utils.get_raid_pokemon(ctx, pokemon))
     elif sub_command == "help":
         await ctx.send(embeds=utils.raid_help())
-    # elif sub_command == 'search':
-    #     await ctx.send(embeds=await utils.search_raids(ctx, bot))
-    # elif sub_command == 'server_join':
-    #     await ctx.send(await utils.get_server_link(bot=bot, id_=raid_id, ctx=ctx), ephemeral=True)
+    elif sub_command == 'search':
+        await ctx.send(embeds=await utils.search_raids(ctx, bot))
+    elif sub_command == 'server_join':
+        await ctx.send(await utils.get_server_link(bot=bot, id_=raid_id, ctx=ctx), ephemeral=True)
 
 
 @bot.event(name='on_message_create')
