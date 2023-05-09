@@ -79,11 +79,11 @@ async def cmd(ctx: interactions.CommandContext, sub_command: str, pokemon: str =
 )
 async def test(ctx: interactions.CommandContext):
     embed = interactions.Embed(title='⚔️ Raid Announcement ⚔️')
-    embed.description = "Hello trainers ! A new raid will start in 5 minutes. Here are the details about the raid.\n \
-**Raid Boss :** Alolan Vulpix\n \
-**Raid Stars :** ⭐⭐\n \
-**Raid ID :** 35\n \
-**Start Time :** May 9, 2023 11:55 AM UTC"
+    embed.description = 'Hello trainers ! A new raid will start in 1 hour. Here are the details about the raid.\n\
+**Raid Boss :** ?\n \
+**Raid Stars :** ⭐⭐\n\
+**Start Time :** <t:1683041467:f> UTC'
+    embed.set_image(url='https://images.pokemonbot.com/assets/raid_eggs/2.png')
     await ctx.send(embeds=embed)
 
 
