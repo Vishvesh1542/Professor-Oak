@@ -108,7 +108,7 @@ async def get_arguments(_input: str) -> dict:
     return pokemon_name, arguments
 
 
-def valid_pokemon(pokemon_name: str, scope: int = Scope.SPAWNPOKEMON) -> bool:
+async def valid_pokemon(pokemon_name: str, scope: int = Scope.SPAWNPOKEMON) -> bool:
     if scope == Scope.SPAWNPOKEMON:
         if pokemon_name.strip().title() not in pokemon_list:
             return False
@@ -125,7 +125,7 @@ async def valid_arguments(arguments: dict, scope: int) -> bool:
                                   , 'spdefiv', 'spdefev', 'speediv', 'speedev', 'nature']
 
     if scope == Scope.RESTRICTED:
-        for argument in AsyncList(list(arguments.keys())):
+        async for argument in AsyncList(list(arguments.keys())):
             if argument.strip().lower() not in ALLOWED_ARGUMENTS_RESTRICTED:
                 return False
 
@@ -140,7 +140,7 @@ async def get_wrong_argument(arguments: dict, scope: int) -> str:
     ALLOWED_ARGUMENTS_RESTRICTED = ['level', 'evtrained', 'godtier']
 
     if scope == Scope.RESTRICTED:
-        for argument in AsyncList(list(arguments.keys())):
+        async for argument in AsyncList(list(arguments.keys())):
             if argument.strip() not in ALLOWED_ARGUMENTS_RESTRICTED:
                 return argument
         return True
@@ -219,20 +219,18 @@ async def process_raid_message(bot, message) -> None:
                                 timestamp=str(message.timestamp), time_left = time_left, stars=stars, id_=raid_id)
     
     
-async def process_message(bot: interactions.Client, message: interactions.message.Message) -> None:
-    print(type(message), message)
-    time1 = time.time()
-    try:
-        embeds = message.embeds
+async def process_message(bot: interactions.Client, message: interactions.Message) -> None:
+    if message.author.username != 'Pokémon':
+        return 
 
-        if embeds != [] and embeds != None:
-            if embeds[0].title == '⚔️ Raid Announcement ⚔️':
-                await process_raid_message(bot, message)
-            elif  embeds[0].title == "A wild pokémon has аppeаred!":
-                channel = await message.get_channel()
-                await channel.send(embeds=await name_pokemon.name_pokemon(embeds[0].image.url))
-    except: pass
-    print(f'Process time: {time.time() - time1}' )
+    embeds = message.embeds
+
+    if embeds != [] and embeds is not None:
+        if embeds[0].title == '⚔️ Raid Announcement ⚔️':
+            await process_raid_message(bot, message)
+        elif  embeds[0].title == "A wild pokémon has аppeаred!":
+            channel = await message.get_channel()
+            await channel.send(embeds=await name_pokemon.name_pokemon(embeds[0].image.url))
 
 
 async def search_raids(ctx, bot: interactions.Client) -> interactions.Embed:
@@ -242,7 +240,6 @@ async def search_raids(ctx, bot: interactions.Client) -> interactions.Embed:
 
     list_of_raid_pokemon = raid_class.get()
 
-    string = "```"
     try:
         max_length = max([len(x[0]) for x in list(list_of_raid_pokemon.values())])
     except Exception:

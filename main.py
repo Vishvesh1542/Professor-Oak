@@ -84,7 +84,7 @@ async def test(ctx: interactions.CommandContext):
 
 
 @bot.event(name='on_message_create')
-async def on_message(message: interactions.message.Message):
+async def on_message(message: interactions.Message):
     await utils.process_message(bot, message)
 
 
