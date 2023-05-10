@@ -44,10 +44,28 @@ Try these commands:'
 
         if not await self._valid_pokemon(pokemon_name):
             embed.color = 0X880808
-            embed.title = f'Invalid Pokémon  :('
+            embed.title = 'Invalid Pokémon  :('
             embed.description = f"**ERROR :** \n Sorry, {pokemon_name} is not a Pokémon."
             return embed
+        
+        if not await self._valid_arguments(args):
+            embed.color = 0X880808
+            embed.title = f'Counters for {pokemon_name}:'
+            embed.dscription = "**ERROR :** \n Sorry, you gave an invalid argument. \n**allowed arguments :** 'godtier', 'evtrained', 'level {value}'"
+            return embed
 
+    async def _valid_arguments(self, args) -> bool:
+        allowed_arguments = ['level', 'evtrained', 'godtier']
+
+        for argument in list(args.keys()):
+            if argument.strip().lower() not in allowed_arguments:
+                return False
+
+            if argument.lower() == 'level':
+                if not args[argument].isdigit():
+                    return False
+
+            return True
 
     
     async def _get_arguments(self, _input: str) -> str | dict:
