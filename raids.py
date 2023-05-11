@@ -1,4 +1,5 @@
 import interactions
+import iohook
 
 class RaidMeta:
     help_embed = interactions.Embed(title='Something went wrong')
@@ -36,24 +37,6 @@ Try these commands:'
     async def get_raid_message(self) -> interactions.Embed:
         return self.help_embed
     
-    async def meta(self, pokemon: str) -> interactions.Embed:
-        embed = interactions.Embed(title="Something went wrong")
-        embed.color = 0x3F704D
-
-        pokemon_name, args = await self._get_arguments(pokemon)
-
-        if not await self._valid_pokemon(pokemon_name):
-            embed.color = 0X880808
-            embed.title = 'Invalid Pokémon  :('
-            embed.description = f"**ERROR :** \n Sorry, {pokemon_name} is not a Pokémon."
-            return embed
-        
-        if not await self._valid_arguments(args):
-            embed.color = 0X880808
-            embed.title = f'Counters for {pokemon_name}:'
-            embed.dscription = "**ERROR :** \n Sorry, you gave an invalid argument. \n**allowed arguments :** 'godtier', 'evtrained', 'level {value}'"
-            return embed
-
     async def _valid_arguments(self, args) -> bool:
         allowed_arguments = ['level', 'evtrained', 'godtier']
 
@@ -65,9 +48,8 @@ Try these commands:'
                 if not args[argument].isdigit():
                     return False
 
-            return True
+        return True
 
-    
     async def _get_arguments(self, _input: str) -> str | dict:
         pokemon_name = ''
         arguments = {}
@@ -92,49 +74,254 @@ Try these commands:'
 
         return pokemon_name, arguments
 
-
     async def _valid_pokemon(self, pokemon_name: str) -> bool:
-        if pokemon_name.strip().title() not in self.pokemon_list:
+        if pokemon_name.strip().title() not in iohook.get_pokemon().get():
             return False
         return True
-
-
-async def get_raid_pokemon(ctx, _input: str) -> interactions.Embed:
-    embed = interactions.Embed(title="Something went wrong")
-    embed.color = 0x3F704D
-
-    pokemon_name, args = await get_arguments(_input)
-
-    embed.title = f'Counters for {pokemon_name}:'
-
-    if not await valid_pokemon(pokemon_name):
-        embed.color = 0X880808
-        embed.title = f'Counters for {pokemon_name} ( Invalid Pokemon ):'
-        embed.add_field(
-            name='Error', value=f'{pokemon_name} is not a valid pokemon!')
-        return embed
-
-    if not await valid_arguments(arguments=args, scope=Scope.RESTRICTED):
-        embed.color = 0X880808
-        embed.title = f'Counters for {pokemon_name}:'
-        embed.add_field(name='Arguments: ( invalid )', value=f'{get_wrong_argument(args, scope=Scope.RESTRICTED)} \
-                         is not a valid argument or has an incorrect value!')
-        return embed
-
-    best_pokemon_list = await raids.get_general_raid_pokemon(pokemon_list[pokemon_name], arguments=args)
-
-    max_length = max(len(item[1]) for item in best_pokemon_list)
-
-    for pokemon_name, move_name, score in best_pokemon_list:
-        embed.add_field(name=pokemon_name, value=f'```{move_name.ljust(max_length)}|{score}```')
-
-
-    string = ""
-    for argument in args:
-        if args[argument] is None:
-            string += argument.title() + ', '
+  
+    async def _get_weakness(self, type_1, type_2, type_3=''):
+        table = {'bug': 1, 'dark': 1, 'electric': 1, 'fairy': 1, 'fighting': 1, 'fire': 1, 'flying': 1, 'ghost': 1, 'grass': 1, 'ground': 1, 'ice': 1, 'normal': 1, 'poison': 1,
+                'psychic': 1, 'rock': 1, 'steel': 1, 'water': 1, 'dragon': 1, 'shadow': 1}
         
-        else:
-            string += argument.title() + ': ' + str(args[argument]) + ', '
-    embed.set_footer(string)
-    return embed
+        weakness_chart = {'bug': {'weak': ('rock', 'fire', 'flying',), 'resist': ('ground', 'grass', 'fighting',), 'immune': ()}
+, 'dark': {'weak': ('fairy', 'bug', 'fighting',), 'resist': ('ghost', 'dark',), 'immune': ('psychic',)}
+, 'dragon': {'weak': ('fairy', 'dragon', 'ice',), 'resist': ('electric', 'water', 'fire', 'grass',), 'immune': ()}
+, 'electric': {'weak': ('ground',), 'resist': ('steel', 'electric', 'flying',), 'immune': ()}
+, 'fairy': {'weak': ('poison', 'steel',), 'resist': ('bug', 'fighting', 'dark',), 'immune': ('dragon',)}
+, 'fighting': {'weak': ('fairy','psychic', 'flying',), 'resist': ('bug', 'rock', 'dark',), 'immune': ()}
+, 'fire': {'weak': ('ground', 'water', 'rock',), 'resist': ('bug', 'ice', 'fire', 'grass', 'steel', 'fairy',), 'immune': ()}
+, 'flying': {'weak': ('rock', 'electric', 'ice',), 'resist': ('grass', 'bug','fighting',), 'immune': ('ground',)}
+, 'ghost': {'weak': ('ghost', 'dark',), 'resist': ('poison', 'bug',), 'immune': ('fighting', 'normal',)}
+, 'grass': {'weak': ('bug', 'ice', 'flying', 'fire', 'poison',), 'resist': ('ground', 'water', 'grass', 'electric',), 'immune': ()}
+, 'ground': {'weak': ('water', 'grass', 'ice',), 'resist': ('poison', 'rock',), 'immune': ('electric',)}
+, 'ice': {'weak': ('rock', 'fighting', 'fire', 'steel',), 'resist': ('ice',), 'immune': ()}
+, 'normal': {'weak': ('fighting',), 'resist': ('ghost',), 'immune': ()}
+, 'poison': {'weak': ('ground', 'psychic',), 'resist': ('fighting', 'bug', 'grass', 'poison', 'fairy',), 'immune': ()}
+, 'psychic': {'weak': ('bug', 'ghost', 'dark',), 'resist': ('psychic', 'fighting',), 'immune': ()}
+, 'rock': {'weak': ('ground', 'fighting', 'water', 'grass', 'steel',), 'resist': ('poison', 'fire', 'normal', 'flying',), 'immune': ()}
+, 'steel': {'weak': ('ground', 'fire', 'fighting',), 'resist': ('psychic', 'normal', 'dragon', 'bug', 'flying', 'ice', 'grass', 'steel', 'fairy', 'rock',), 'immune': ('poison',)}
+, 'water': {'weak': ('electric', 'grass',), 'resist': ('ice', 'water', 'fire', 'steel',), 'immune': ()}
+, 'shadow': {'weak': (), 'resis': (), 'immune': ()}
+}
+
+
+        if type_1.lower() == 'shadow':
+            type_1 = type_2
+            type_2 = type_3
+
+        for effectiveness, _types in list(weakness_chart[type_1.lower()].items()):
+            if effectiveness == 'weak':
+                for _type in _types:
+                    table[_type] *= 2
+            elif effectiveness == 'resist':
+                for _type in _types:
+                    table[_type] *= .5
+            elif effectiveness == 'immune':
+                for _type in _types:
+                    table[_type] *= 0
+
+        if type_2 == '':
+            return table
+
+        for effectiveness, _types in list(weakness_chart[type_2.lower()].items()):
+            if effectiveness == 'weak':
+                for _type in _types:
+                    table[_type] *= 2
+            elif effectiveness == 'resist':
+                for _type in _types:
+                    table[_type] *= .5
+            elif effectiveness == 'immune':
+                for _type in _types:
+                    table[_type] *= 0
+
+        for key, value in list(table.items()):
+            if value == 0:
+                table[key] = 0.25
+        return table
+
+    async def _get_damage(self, attacking_pokemon: dict, defending_pokemon: dict, move: list, random_number: int = 0.925) -> int:
+        atk_by_def = 0
+        defending_pokemon_weakness = await self._get_weakness(*defending_pokemon['type'])
+
+        if move[2] == 'p':
+            atk_by_def = attacking_pokemon['atk'] / defending_pokemon['def']
+
+        elif move[2] == 's':
+            atk_by_def = attacking_pokemon['spatk'] / defending_pokemon['spdef']
+
+        damage = int(((2 * attacking_pokemon['level'] * .2 + 2) * move[1][0] * atk_by_def *
+                    (0.02 * move[1][1] * .01) + 2) * defending_pokemon_weakness[move[0].lower()] * random_number)
+
+        return damage
+
+    async def _get_stats(self, pokemon: dict, level: int, arguments: dict) -> dict:
+        iv = {'hp': 20, 'atk': 20, 'def': 20,
+            'spatk': 20, 'spdef': 20, 'speed': 20}
+        ev = {'hp': 0, 'atk': 0, 'def': 0,
+            'spatk': 0, 'spdef': 0, 'speed': 0}
+
+        for argument in list(arguments.keys()):
+            argument = argument.lower()
+            if argument == 'hpiv':
+                iv['hp'] = int(arguments['hpiv'])
+            elif argument == 'atkiv':
+                iv['atk'] = int(arguments['atkiv'])
+            elif argument == 'defiv':
+                iv['def'] = int(arguments['defiv'])
+            elif argument == 'spatkiv':
+                iv['spatk'] = int(arguments['spatkiv'])
+            elif argument == 'spdefiv':
+                iv['spdef'] = int(arguments['spdefiv'])
+            elif argument == 'speediv':
+                iv['speed'] = int(arguments['speediv'])
+
+            elif argument == 'hpev':
+                ev['hp'] = int(arguments['hpev'])
+            elif argument == 'atkev':
+                ev['atk'] = int(arguments['atkev'])
+            elif argument == 'defev':
+                ev['def'] = int(arguments['defev'])
+            elif argument == 'spatkev':
+                ev['spatk'] = int(arguments['spatkev'])
+            elif argument == 'spdefev':
+                ev['spdef'] = int(arguments['spdefev'])
+            elif argument == 'speedev':
+                ev['speed'] = int(arguments['speedev'])
+
+            if argument == 'evtrained':
+                ev['hp'] = 252
+                ev['atk'] = 252
+                ev['spatk'] = 252
+            elif argument == 'godtier':
+                iv['hp'] = 31
+                iv['atk'] = 31
+                iv['spatk'] = 31
+                iv['def'] = 26
+                iv['spdef'] = 26
+                iv['speed'] = 20
+
+        stats = pokemon.copy()
+        stats['hp'] = int(((iv['hp'] + (2 * int(pokemon['hp'])) +
+                            (ev['hp'] / 4) + 100) * level) / 100 + 10)
+        stats['atk'] = int(((iv['atk'] + (2 * int(pokemon['atk'])) +
+                            (ev['atk'] / 4)) * level) / 100 + 5)
+        stats['def'] = int(((iv['def'] + (2 * int(pokemon['def'])) +
+                            (ev['def'] / 4)) * level) / 100 + 5)
+        stats['spatk'] = int(((iv['spatk'] + (2 * int(pokemon['spatk'])) +
+                            (ev['spatk'] / 4)) * level) / 100 + 5)
+        stats['spdef'] = int(((iv['spdef'] + (2 * int(pokemon['spdef'])) +
+                            (ev['spdef'] / 4)) * level) / 100 + 5)
+        stats['speed'] = int(((iv['speed'] + (2 * int(pokemon['speed'])) +
+                            (ev['speed'] / 4)) * level) / 100 + 5)
+        stats['level'] = level
+
+        stats['type'] = [x.lower() for x in stats['type']]
+
+        return stats
+
+    async def _get_score(self, attacking_pokemon: dict, defending_pokemon: dict) -> int:
+        score = 0
+
+        avg_damage_done = await self._get_damage(attacking_pokemon=attacking_pokemon,
+                                    defending_pokemon=defending_pokemon, move=attacking_pokemon['move'])
+        avg_damage_taken = []
+
+        score += avg_damage_done
+        avg_damage_taken.append(await self._get_damage(
+            defending_pokemon, attacking_pokemon, ['normal', [40, 100], 'p']))
+        for move in defending_pokemon['moves']:
+            avg_damage_taken.append(await self._get_damage(
+                defending_pokemon, attacking_pokemon, move))
+        score -= sum(avg_damage_taken)/len(avg_damage_taken) * 4
+
+        return int(score)
+
+    async def _get_raid_pokemon(self, pokemon: dict, arguments: dict) -> list:
+        score_list = []
+
+        level = 100
+        if 'level' in arguments:
+            level = int(arguments['level'])
+
+        spawn_pokemon = await self._get_stats(pokemon, level=level, arguments={})
+
+        for rpokemon in iohook.get_raid_pokemon().get():
+            pokemon = await self._get_stats(rpokemon, level=100, arguments=arguments)
+            score = await self._get_score(attacking_pokemon=pokemon,
+                            defending_pokemon=spawn_pokemon)
+            score_list.append([rpokemon['name'], rpokemon['move'][3], score])
+
+        return sorted(score_list, key=lambda x: x[2], reverse=True)
+
+    async def meta(self, bot: interactions.Client, ctx, pokemon: str) -> interactions.Embed:
+        embed = interactions.Embed(title="Something went wrong")
+        embed.color = 0x3F704D
+
+        pokemon_name, args = await self._get_arguments(pokemon)
+
+        if not await self._valid_pokemon(pokemon_name):
+            embed.color = 0X880808
+            embed.title = 'Invalid Pokémon  :('
+            embed.description = f"**ERROR :** \n Sorry, {pokemon_name} is not a Pokémon."
+            return embed, None
+        
+        if not await self._valid_arguments(args):
+            embed.color = 0X880808
+            embed.title = f'Counters for {pokemon_name}:'
+            embed.description = "**ERROR :** \n Sorry, you gave an invalid argument. \n**allowed arguments :** 'godtier', 'evtrained', 'level {value}'"
+            return embed, None
+        
+        pokemon = iohook.get_pokemon().get_value(pokemon_name)
+
+        best_pokemon_list = await self._get_raid_pokemon(pokemon, arguments=args)
+
+        number_of_items_in_page = 5
+        split_lists = [best_pokemon_list[i:i+number_of_items_in_page] for i in range(0, len(best_pokemon_list), number_of_items_in_page)]
+        pages = []
+
+        for i in best_pokemon_list[:5]:
+            embed.add_field(name=i[0], value=f'{i[1]} | {i[2]}')
+        components = interactions.Button(style=interactions.ButtonStyle.DANGER, label='something', custom_id='Next')
+        return embed, components
+            # pages.append(Page("Page 1", embeds=embed))
+
+
+# async def get_raid_pokemon(self, ctx, _input: str) -> interactions.Embed:
+#     embed = interactions.Embed(title="Something went wrong")
+#     embed.color = 0x3F704D
+
+#     pokemon_name, args = await self._get_arguments(_input)
+
+#     embed.title = f'Counters for {pokemon_name}:'
+
+#     if not await valid_pokemon(pokemon_name):
+#         embed.color = 0X880808
+#         embed.title = f'Counters for {pokemon_name} ( Invalid Pokemon ):'
+#         embed.add_field(
+#             name='Error', value=f'{pokemon_name} is not a valid pokemon!')
+#         return embed
+
+#     if not await valid_arguments(arguments=args, scope=Scope.RESTRICTED):
+#         embed.color = 0X880808
+#         embed.title = f'Counters for {pokemon_name}:'
+#         embed.add_field(name='Arguments: ( invalid )', value=f'{get_wrong_argument(args, scope=Scope.RESTRICTED)} \
+#                          is not a valid argument or has an incorrect value!')
+#         return embed
+
+#     best_pokemon_list = await raids.get_general_raid_pokemon(pokemon_list[pokemon_name], arguments=args)
+
+#     max_length = max(len(item[1]) for item in best_pokemon_list)
+
+#     for pokemon_name, move_name, score in best_pokemon_list:
+#         embed.add_field(name=pokemon_name, value=f'```{move_name.ljust(max_length)}|{score}```')
+
+
+#     string = ""
+#     for argument in args:
+#         if args[argument] is None:
+#             string += argument.title() + ', '
+        
+#         else:
+#             string += argument.title() + ': ' + str(args[argument]) + ', '
+#     embed.set_footer(string)
+#     return embed
