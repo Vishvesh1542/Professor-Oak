@@ -4,7 +4,7 @@ import raids
 import iohook
 import raid_search
 
-token = "_secret_"
+token = "MTEwNTg2NzQ4NTkwNDkxNjUxMA.GeVGBd.EIqurAJanZJM9pAQGQPIXXZj700O6Lx3kvJxO0"
 
 bot = interactions.Client(token=token, intents=interactions.Intents.ALL)
 
@@ -17,8 +17,7 @@ async def on_ready():
 
     print('ready')
 
-# Some random change
-# yayy
+
 # Test command
 command_help = interactions.Option(
     name='help',
