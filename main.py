@@ -4,7 +4,7 @@ import raids
 import iohook
 import raid_search
 
-token = "_secret_   "
+token = "_secret_"
 
 bot = interactions.Client(token=token, intents=interactions.Intents.ALL)
 
