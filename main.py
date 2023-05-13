@@ -1,19 +1,31 @@
 import interactions
-import utils
+from interactions.ext.paginator import Paginator
 import raids
-import name_pokemon
+import iohook
+import raid_search
 
+token = "_secret_"
 
-bot = interactions.Client(token="token",
-                          intents=interactions.Intents.ALL)
+bot = interactions.Client(token=token, intents=interactions.Intents.ALL)
 
+@bot.event
+async def on_ready():
+    global raidmeta, raidsearch
+    raidmeta = raids.RaidMeta()
+    raidsearch = raid_search.RaidSearcher(bot=bot)
+    iohook.init()
 
-@bot.command(
-    name="raid",
-    description="All the commands about raids",
-    options=[
-        # Raid meta
-        interactions.Option(
+    print('ready')
+
+# Some random change
+# yayy
+# Test command
+command_help = interactions.Option(
+    name='help',
+    description='Get help about how to use my raid commands!',
+    type=interactions.OptionType.SUB_COMMAND
+)
+command_meta = interactions.Option(
             name="meta",
             description="Using Professor Oak's experience get the best counters to any Pokémon!",
             type=interactions.OptionType.SUB_COMMAND,
@@ -23,49 +35,61 @@ bot = interactions.Client(token="token",
                     description="Pokémon whose best raid counters you want to get.",
                     type=interactions.OptionType.STRING,
                     required=True,
-                ),
+                ),  
             ],
-        ),
-
-        # Raid help
+        )
+command_search = interactions.Option(
+    name='search',
+    description="Globals time and don't know which server to join? No worry! Everything is one command away!",
+    type=interactions.OptionType.SUB_COMMAND,
+    options=[
         interactions.Option(
-            name="help",
-            description="Get help about how to use the raid calculation feature.",
-            type=interactions.OptionType.SUB_COMMAND,
-        ),
-
-        # Raid search
-        interactions.Option(
-            name="search",
-            description="Show all the on-going raids!",
-            type=interactions.OptionType.SUB_COMMAND,
-        ),
-        # Raid joins
-        interactions.Option(
-            name="server_join",
-            description="Show all the on-going raids!",
-            type=interactions.OptionType.SUB_COMMAND,
-            options=[
-                interactions.Option(
-                    name='raid_id',
-                    description='The ID of the raid you want to join.',
-                    type=interactions.OptionType.INTEGER,
-                    required=True
-                )
-            ]
-        ),
-    ],
+            name='group',
+            description="If you have access to private servers, type the _secret code_ to get access to them.",
+            type=interactions.OptionType.STRING,
+            required=False
+        )
+    ]
 )
-async def cmd(ctx: interactions.CommandContext, sub_command: str, pokemon: str = "", raid_id: int = 0):
-    if sub_command == "meta":
-        await ctx.send(embeds=await utils.get_raid_pokemon(ctx, pokemon))
-    elif sub_command == "help":
-        await ctx.send(embeds=utils.raid_help())
+
+
+subcommands = [
+command_help,
+command_meta,
+command_search
+]
+@bot.command(
+        name='raid', description='If you see this you are hacking', scope=1084731374344359966,
+        options=subcommands)
+async def raid(ctx: interactions.CommandContext, sub_command: str, pokemon: str=' ', group=None):
+    if sub_command == 'help':
+        await ctx.send(embeds=await raidmeta.get_raid_message())
+    elif sub_command == 'meta':
+        embeds, pages = await raidmeta.meta(pokemon=pokemon)
+        if embeds:
+            await ctx.send(embeds=embeds)
+        else:
+            await   Paginator(client=bot, ctx=ctx, pages=pages, disable_after_timeout=True, use_select=False).run()
     elif sub_command == 'search':
-        await ctx.send(embeds=await utils.search_raids(ctx, bot))
-    elif sub_command == 'server_join':
-        await ctx.send(await utils.get_server_link(bot=bot, id_=raid_id, ctx=ctx), ephemeral=True)
+        list_ = raidsearch.get_raids(group)
+        embeds = interactions.Embed(title='Something went wrong.')
+
+        for item in list_:
+            embeds.add_field(name=item.raid_boss, value=str(item.get_time_left()))
         
+        await ctx.send(embeds=embeds)
+
+
+@bot.event(name='on_message_create')
+async def on_message(message: interactions.Message):
+    # if message.author != "Pokémon":
+    #     return
+    if message.embeds == []:
+        return
+    
+    if message.embeds[0].title == '⚔️ Raid Announcement ⚔️':
+        raidsearch.add_raid(message=message)
+
 
 @bot.command(
     name='test',
@@ -80,35 +104,6 @@ async def test(ctx: interactions.CommandContext):
 **Start Time :** <t:1683041467:f> UTC'
     embed.set_image(url='https://images.pokemonbot.com/assets/raid_eggs/2.png')
     await ctx.send(embeds=embed)
-
-
-
-@bot.event(name='on_message_create')
-async def on_message(message: interactions.Message):
-    await utils.process_message(bot, message)
-
-
-@bot.command(
-    name='toggle',
-    description='If u can see this u are hacking',
-    options=[
-        interactions.Option(
-                name='raidpublic',
-                description='Toggles if this server can be viewed by typeing /raid search',
-                type=interactions.OptionType.SUB_COMMAND
-        )
-    ]
-)
-async def toggle(ctx: interactions.CommandContext, sub_command=str):
-    await ctx.send(await utils.toggle_public_server(ctx=ctx, bot=bot))
-
-
-@bot.event
-async def on_ready():
-    utils.init_files()
-    raids.init_files()
-    name_pokemon.init_files()
-    print('ready!')
 
 
 bot.start()
