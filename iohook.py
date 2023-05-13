@@ -57,12 +57,16 @@ class IOHOOK:
             json.dump(self._list, file)
 
 def init():
-    global pokemon, raid_pokemon
+    global pokemon, raid_pokemon, public_servers
     pokemon = IOHOOK(os.getcwd() + '/data/pokemon_dict.json')
     raid_pokemon = IOHOOK(os.getcwd() + '/data/raid_pokemon_dict.json')
+    public_servers = IOHOOK(os.getcwd() + '/data/public_servers.json')
 
-def get_pokemon() -> dict:
+def get_pokemon() -> IOHOOK:
     return pokemon
 
-def get_raid_pokemon() -> list:
+def get_raid_pokemon() -> IOHOOK:
     return raid_pokemon
+
+def get_public_servers() -> IOHOOK:
+    return public_servers

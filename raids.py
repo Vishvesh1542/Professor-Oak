@@ -1,4 +1,5 @@
 import interactions
+from interactions.ext.paginator import Page
 import iohook
 
 class RaidMeta:
@@ -253,75 +254,43 @@ Try these commands:'
 
         return sorted(score_list, key=lambda x: x[2], reverse=True)
 
-    async def meta(self, bot: interactions.Client, ctx, pokemon: str) -> interactions.Embed:
-        embed = interactions.Embed(title="Something went wrong")
-        embed.color = 0x3F704D
-
+    async def meta(self, pokemon: str) -> interactions.Embed | list:
         pokemon_name, args = await self._get_arguments(pokemon)
 
         if not await self._valid_pokemon(pokemon_name):
-            embed.color = 0X880808
-            embed.title = 'Invalid Pokémon  :('
-            embed.description = f"**ERROR :** \n Sorry, {pokemon_name} is not a Pokémon."
-            return embed, None
-        
+            return interactions.Embed(title='Invalid Pokémon  :(', color=0X880808, 
+                                    description=f"**ERROR :** \n Sorry, {pokemon_name} is not a Pokémon."), None
+            
         if not await self._valid_arguments(args):
-            embed.color = 0X880808
-            embed.title = f'Counters for {pokemon_name}:'
-            embed.description = "**ERROR :** \n Sorry, you gave an invalid argument. \n**allowed arguments :** 'godtier', 'evtrained', 'level {value}'"
-            return embed, None
-        
+            return interactions.Embed(title=f'Counters for {pokemon_name}:', color=0X880808, 
+                                    description="**ERROR :** \n Sorry, you gave an invalid argument. \n**allowed arguments :** 'godtier', 'evtrained', 'level {value}'"), None
+            
         pokemon = iohook.get_pokemon().get_value(pokemon_name)
-
         best_pokemon_list = await self._get_raid_pokemon(pokemon, arguments=args)
 
         number_of_items_in_page = 5
         split_lists = [best_pokemon_list[i:i+number_of_items_in_page] for i in range(0, len(best_pokemon_list), number_of_items_in_page)]
-        pages = []
-
-        for i in best_pokemon_list[:5]:
-            embed.add_field(name=i[0], value=f'{i[1]} | {i[2]}')
-        components = interactions.Button(style=interactions.ButtonStyle.DANGER, label='something', custom_id='Next')
-        return embed, components
-            # pages.append(Page("Page 1", embeds=embed))
-
-
-# async def get_raid_pokemon(self, ctx, _input: str) -> interactions.Embed:
-#     embed = interactions.Embed(title="Something went wrong")
-#     embed.color = 0x3F704D
-
-#     pokemon_name, args = await self._get_arguments(_input)
-
-#     embed.title = f'Counters for {pokemon_name}:'
-
-#     if not await valid_pokemon(pokemon_name):
-#         embed.color = 0X880808
-#         embed.title = f'Counters for {pokemon_name} ( Invalid Pokemon ):'
-#         embed.add_field(
-#             name='Error', value=f'{pokemon_name} is not a valid pokemon!')
-#         return embed
-
-#     if not await valid_arguments(arguments=args, scope=Scope.RESTRICTED):
-#         embed.color = 0X880808
-#         embed.title = f'Counters for {pokemon_name}:'
-#         embed.add_field(name='Arguments: ( invalid )', value=f'{get_wrong_argument(args, scope=Scope.RESTRICTED)} \
-#                          is not a valid argument or has an incorrect value!')
-#         return embed
-
-#     best_pokemon_list = await raids.get_general_raid_pokemon(pokemon_list[pokemon_name], arguments=args)
-
-#     max_length = max(len(item[1]) for item in best_pokemon_list)
-
-#     for pokemon_name, move_name, score in best_pokemon_list:
-#         embed.add_field(name=pokemon_name, value=f'```{move_name.ljust(max_length)}|{score}```')
-
-
-#     string = ""
-#     for argument in args:
-#         if args[argument] is None:
-#             string += argument.title() + ', '
         
-#         else:
-#             string += argument.title() + ': ' + str(args[argument]) + ', '
-#     embed.set_footer(string)
-#     return embed
+        pages = []
+        string = ''
+        for key, value in list(args.items()):
+            if value is None:
+                string += key.title() + ', '
+                continue
+            string += key.title() + ": " + value + ', '
+
+        for index, page in enumerate(split_lists, start=1):
+            embed = interactions.Embed(title=f"Counters for {pokemon_name}", color=0x3F704D)
+            max_size = max(len(i[1]) for i in page)
+            embed.set_author(string)
+            
+            for i in page:
+                embed.add_field(name=i[0], value=f'```{i[1].ljust(max_size)} | {i[2]}```')
+            
+            embed.set_footer(text=f'Showing page {index} of {len(split_lists)}')
+            pages.append(Page(embeds=embed))
+        
+        return None, pages
+
+        # return embed
+            # pages.append(Page("Page 1", embeds=embed))
