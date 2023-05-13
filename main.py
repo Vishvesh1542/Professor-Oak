@@ -17,7 +17,8 @@ async def on_ready():
 
     print('ready')
 
-
+# Some random change
+# yayy
 # Test command
 command_help = interactions.Option(
     name='help',
