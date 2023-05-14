@@ -86,7 +86,7 @@ def raid_help() -> interactions.Embed:
     return embed
 
 
-async def get_arguments(_input: str) -> str | dict:
+async def get_arguments(_input: str) -> dict:
     pokemon_name = ''
     arguments = {}
     seperator = ' --'
