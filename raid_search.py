@@ -60,11 +60,12 @@ class RaidSearcher:
             elif time_until_raid == '5 minutes':
                 time_left = 300
             time_ = datetime.fromisoformat(str(message.timestamp)).timestamp()
-            self.current_raids.append(Raid(raid_boss=raid_boss, raid_id=raid_id, server_id=message.guild_id, raid_stars=int(stars),\
+            self.current_raids.append(Raid(raid_boss=raid_boss, raid_id=raid_id, server_id=message.guild_id, raid_stars=len(stars),\
                                            time_left=time_left, message_time=time_, group=public_servers[message.guild_id]))
             
     def get_raids(self, group) -> list:
-        _list = [x for x in self.current_raids if x.get_time_left() <= 0 and x.group == group]        
+        print(self.current_raids)
+        _list = [x for x in self.current_raids if x.get_time_left() >= 0 and x.group == group]        
         return _list
     
     async def get_invite_link(self, raid_id) -> str:

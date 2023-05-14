@@ -71,13 +71,13 @@ async def raid(ctx: interactions.CommandContext, sub_command: str, pokemon: str=
             await   Paginator(client=bot, ctx=ctx, pages=pages, disable_after_timeout=True, use_select=False).run()
     elif sub_command == 'search':
         list_ = raidsearch.get_raids(group)
+        print(list_)
         embeds = interactions.Embed(title='Something went wrong.')
 
         for item in list_:
             embeds.add_field(name=item.raid_boss, value=str(item.get_time_left()))
         
         await ctx.send(embeds=embeds)
-
 
 @bot.event(name='on_message_create')
 async def on_message(message: interactions.Message):
