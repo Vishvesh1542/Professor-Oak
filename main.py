@@ -16,8 +16,7 @@ async def on_ready():
     iohook.init()
 
     print('ready')
-
-
+# very important changes
 # Test command
 command_help = interactions.Option(
     name='help',
