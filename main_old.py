@@ -102,7 +102,6 @@ async def on_message(message: interactions.Message):
 async def toggle(ctx: interactions.CommandContext, sub_command=str):
     await ctx.send(await utils.toggle_public_server(ctx=ctx, bot=bot))
 
-# just teaching raxton 
 @bot.event
 async def on_ready():
     utils.init_files()
