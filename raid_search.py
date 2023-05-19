@@ -27,7 +27,7 @@ class Raid:
         self.raid_id = str(raid_id)
 
     def get_time_left(self) -> int:
-        time_left = time.time() - self.message_time + self.time_left
+        time_left = self.message_time + self.time_left - time.time() 
         return time_left
     
     def get_time_left_string(self) -> str:
@@ -75,32 +75,30 @@ class RaidSearcher:
         _list = [x for x in self.current_raids if x.get_time_left() >= 0 and x.group == group]        
         return _list
     
-
        
-    def get_server_id(self, raid_id):
+    async def get_invite_link(self, raid_id) -> str:
         for i in list(self.current_raids):
             if i.raid_id != '-':
                 if int(i.raid_id) == int(raid_id):
-                    return i.server_id
-        return False
-    async def get_invite_link(self, raid_id) -> str:
-        server_id = self.get_server_id(raid_id)
-        if server_id == False:
-            return f'Sorry the raid with id {raid_id} does not exist'
-        guild = await self.bot._http.get_guild(server_id) 
+                    server_id = i.server_id
+                    break
+        else:
+            return f'Sorry, the raid with id {raid_id} does not exist'
+
+        guild = await self.bot._http.get_guild(server_id)
         invite_arguments = {
             'max_age': 120,
             'max_uses': 1,
             'temporary': True,
-
         }
-        owner_id = guild['owner_id']
+
         first_channel_id = guild['system_channel_id']
         try:
             invite_link = await self.bot._http.create_channel_invite(first_channel_id, payload=invite_arguments)
             return f"https://discord.com/invite/{invite_link['code']}"
 
         except:
+            owner_id = guild['owner_id']
             owner = await self.bot._http.get_user(int(owner_id))
             return f"Sorry, I do not have the required permissions in that server to create an invite link :( \n\
 This server is owned by `@{owner['username']}#{owner['discriminator']}`. Please contact him/her. \n\

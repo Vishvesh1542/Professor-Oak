@@ -5,39 +5,6 @@ import iohook
 class RaidMeta:
     help_embed = interactions.Embed(title='Something went wrong')
 
-    def __init__(self) -> None:
-        self.init_raid_message()
-        
-    def init_raid_message(self) -> None:
-        self.help_embed.title = 'How to use the raid commands?'
-        self.help_embed.color = 0xC8A2C8
-
-        self.help_embed.description = '\
-"Professor Oak is experienced in raids\n\
-and can quickly identify counter Pokémon.\n\
-He scores Pokémon to aid in selection.\n\
-He also can watch after servers for raids!\n\
-Try these commands:'
-
-        self.help_embed.add_field(name='/raid meta {pokemon}',
-                        value='Professor Oak compares some of \
-                            the best pokemon and tells which is most effective.')
-
-        self.help_embed.add_field(name='/raid search {args}',
-                        value="Globals and don't have any raids? No problem! search for raids across servers and join them if u like!")
-        
-        self.help_embed.add_field(name='/raid server_join {id}',
-                        value="Found a raid but are not in the server? Just type the id of the raid and join the server!")
-        
-        self.help_embed.add_field(name='/toggle server',
-                        value="Want other people to look at what raids your server has to offer? Just toggle it on!")
-
-        self.help_embed.set_footer(
-            "Note that the {pokemon}, {args} & {id} are variables.")
-
-    async def get_raid_message(self) -> interactions.Embed:
-        return self.help_embed
-    
     async def _valid_arguments(self, args) -> bool:
         allowed_arguments = ['level', 'evtrained', 'godtier']
 
@@ -291,6 +258,3 @@ Try these commands:'
             pages.append(Page(embeds=embed))
         
         return None, pages
-
-        # return embed
-            # pages.append(Page("Page 1", embeds=embed))
