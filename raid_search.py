@@ -45,7 +45,41 @@ class RaidSearcher:
 
     def add_raid(self, message: interactions.Message):
         public_servers = iohook.get_public_servers().get()
-        if message.guild_id in public_servers:
+        if int(message.guild_id) in public_servers:
+            for raid in self.current_raids:
+                if raid.server_id == int(message.guild_id):
+                    embed = message.embeds
+                    description = embed[0].description
+                    
+                    raid_boss = description.split('**Raid Boss :**')[1].split('\n')[0].strip()
+                    stars = description.split('**Raid Stars :**')[1].split('\n')[0].strip()
+                    time_until_raid = description.split('A new raid will start in')[1].split('.')[0].strip()
+                    raid_id = '-'
+
+                    if 'Raid ID' in description:
+                        raid_id = description.split('**Raid ID :**')[1].split('\n')[0].strip()
+
+                    time_left = 0
+
+                    if time_until_raid == '1 hour':
+                        time_left = 4500
+                    elif time_until_raid == '15 minutes':
+                        time_left = 900
+                    elif time_until_raid == '10 minutes':
+                        time_left = 600
+                    elif time_until_raid == '5 minutes':
+                        time_left = 300
+                    time_ = datetime.fromisoformat(str(message.timestamp)).timestamp()
+                    raid.raid_boss = raid_boss
+                    raid.raid_id = raid_id
+                    raid.server_id = int(message.guild_id)
+                    raid.raid_stars = len(stars)
+                    raid.time_left = time_left
+                    raid.message_time = time_
+                    raid.group = public_servers[message.guild_id]
+
+            if message.guild_id in [x.server_id for x in self.current_raids]:
+
             embed = message.embeds
             description = embed[0].description
             
@@ -68,7 +102,7 @@ class RaidSearcher:
             elif time_until_raid == '5 minutes':
                 time_left = 300
             time_ = datetime.fromisoformat(str(message.timestamp)).timestamp()
-            self.current_raids.append(Raid(raid_boss=raid_boss, raid_id=raid_id, server_id=message.guild_id, raid_stars=len(stars),\
+            self.current_raids.append(Raid(raid_boss=raid_boss, raid_id=raid_id, server_id=int(message.guild_id), raid_stars=len(stars),\
                                            time_left=time_left, message_time=time_, group=public_servers[message.guild_id]))
             
     def get_raids(self, group) -> list:

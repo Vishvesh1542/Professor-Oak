@@ -338,14 +338,14 @@ async def on_message(message: interactions.Message):
     if message.embeds[0].title == '⚔️ Raid Announcement ⚔️':
         try:
             raidsearch.add_raid(message=message)
-        except:
-            print('failed to add raid')
+        except Exception as e:
+            print(e)
     elif message.embeds[0].title == "A wild pokémon has аppeаred!":
         try:
             embeds_ = await name_pokemon(image_url=message.embeds[0].url)
             channel = await message.get_channel()
             await channel.send(embeds=embeds_)
-        except:
-            print('Unable to name pokemon')
+        except Exception as e:
+            print(e)
 
 bot.start()
