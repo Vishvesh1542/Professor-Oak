@@ -354,8 +354,8 @@ async def test2(ctx: interactions.CommandContext):
 
 @bot.event(name='on_message_create')
 async def on_message(message: interactions.Message):
-    # if int(message.author.id) != 669228505128501258:
-    #     return
+    if int(message.author.id) != 669228505128501258:
+        return
     if message.embeds == []:
         return
     if message.embeds[0].title is None:
