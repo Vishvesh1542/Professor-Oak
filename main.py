@@ -54,9 +54,7 @@ command_search
         name='raid', description='If you see this you are hacking',
         options=subcommands)
 async def raid(ctx: interactions.CommandContext, sub_command: str, pokemon: str=' ', group=None):
-    if sub_command == 'help':
-        await ctx.send(embeds=await raidmeta.get_raid_message())
-    elif sub_command == 'meta':
+    if sub_command == 'meta':
         try:
             embeds, pages = await raidmeta.meta(pokemon=pokemon)
             if embeds:
