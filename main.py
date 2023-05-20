@@ -5,7 +5,7 @@ import iohook
 import raid_search
 from name_pokemon import name_pokemon, init_files
 
-token = "MTEwNTg2NzQ4NTkwNDkxNjUxMA.GeVGBd.EIqurAJanZJM9pAQGQPIXXZj700O6Lx3kvJxO0"
+token = "token"
 
 bot = interactions.Client(token=token, intents=interactions.Intents.ALL)
 
