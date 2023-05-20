@@ -77,8 +77,7 @@ class RaidSearcher:
                     raid.time_left = time_left
                     raid.message_time = time_
                     raid.group = public_servers[message.guild_id]
-
-            if message.guild_id in [x.server_id for x in self.current_raids]:
+                    return
 
             embed = message.embeds
             description = embed[0].description
