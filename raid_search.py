@@ -45,9 +45,11 @@ class RaidSearcher:
 
     def add_raid(self, message: interactions.Message):
         public_servers = iohook.get_public_servers().get()
-        if int(message.guild_id) in public_servers:
+        print(str(message.guild_id in public_servers))
+        if str(message.guild_id) in public_servers:
+            print('in')
             for raid in self.current_raids:
-                if raid.server_id == int(message.guild_id):
+                if str(raid.server_id) == str(message.guild_id):
                     embed = message.embeds
                     description = embed[0].description
                     

@@ -5,8 +5,7 @@ import iohook
 import raid_search
 from name_pokemon import name_pokemon, init_files
 
-token = "token"
-
+token = "OTcxMzQyNzEwNzI2MzQ4ODEw.GYVCAw.l3JPCN5C2bNdF9eOOtzf1pMeqo-quUo3EHrGxo"
 bot = interactions.Client(token=token, intents=interactions.Intents.ALL)
 
 @bot.event
@@ -124,11 +123,8 @@ async def raid(ctx: interactions.CommandContext, sub_command: str, pokemon: str=
 )
 async def server(ctx: interactions.CommandContext, sub_command: str, server_id: int=-1):
     if sub_command == 'join':
-        try:
-            server_ = await raidsearch.get_invite_link(raid_id=server_id)
-            await ctx.send(server_, ephemeral=True)
-        except Exception as e:
-            print(e)
+        server_ = await raidsearch.get_invite_link(raid_id=server_id)
+        await ctx.send(server_, ephemeral=True)
 
     elif sub_command == 'make_public':
         if ctx.user.id != ctx.guild.owner_id:
@@ -326,24 +322,50 @@ doubts"
 
     await Paginator(client=bot, ctx=ctx, pages=[Page(embeds=page_1), Page(embeds=page_2), Page(embeds=page_3), Page(embeds=page_4), Page(embeds=page_5)]).run()
 
+
+
+@bot.command(
+    name='test',
+    description="Get help about how to use my commands.",
+    scope=1084731374344359966
+)
+async def test(ctx: interactions.CommandContext):
+    embeds = interactions.Embed(title='A wild pokémon has аppeаred!')
+    embeds.set_image(url='https://images.pokemonbot.com/assets/raid_eggs/2.png')
+
+    await ctx.send(embeds=embeds)
+
+@bot.command(
+    name='test2',
+    description='If u can see this u are hacking',
+    scope=1084731374344359966,
+)
+async def test2(ctx: interactions.CommandContext):
+    embed = interactions.Embed(title='⚔️ Raid Announcement ⚔️')
+    embed.description = 'Hello trainers ! A new raid will start in 1 hour. Here are the details about the raid.\n\
+**Raid Boss :** ?\n \
+**Raid Stars :** ⭐⭐\n\
+**Raid ID :** 1\n\
+**Start Time :** <t:1683041467:f> UTC'
+    embed.set_image(url='https://images.pokemonbot.com/assets/raid_eggs/2.png')
+    await ctx.send(embeds=embed)
+
+
+
 @bot.event(name='on_message_create')
 async def on_message(message: interactions.Message):
-    if message.author != "Pokémon":
-        return
+    # if int(message.author.id) != 669228505128501258:
+    #     return
     if message.embeds == []:
         return
-    
+    if message.embeds[0].title is None:
+        return
     if message.embeds[0].title == '⚔️ Raid Announcement ⚔️':
-        try:
-            raidsearch.add_raid(message=message)
-        except Exception as e:
-            print(e)
-    elif message.embeds[0].title == "A wild pokémon has аppeаred!":
-        try:
-            embeds_ = await name_pokemon(image_url=message.embeds[0].url)
-            channel = await message.get_channel()
-            await channel.send(embeds=embeds_)
-        except Exception as e:
-            print(e)
+        raidsearch.add_raid(message=message)
+    # elif message.embeds[0].title.strip() == "A wild pokémon has аppeаred!":
+    #     print(type(message.embeds[0]), message.embeds[0].url)
+    #     embeds_ = await name_pokemon(image_url=message.embeds[0].url)
+    #     channel = await message.get_channel()
+    #     await channel.send(embeds=embeds_)
 
 bot.start()
