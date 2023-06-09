@@ -107,7 +107,9 @@ class RaidSearcher:
                                            time_left=time_left, message_time=time_, group=public_servers[message.guild_id]))
             
     def get_raids(self, group) -> list:
-        _list = [x for x in self.current_raids if x.get_time_left() >= 0 and x.group == group]        
+        _list_new = [x for x in self.current_raids if x.get_time_left() > 0]          
+        _list = [x for x in _list_new if x.group == group]    
+        self.current_raids = _list_new
         return _list
     
        
