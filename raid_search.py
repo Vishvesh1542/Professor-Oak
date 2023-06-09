@@ -109,7 +109,8 @@ class RaidSearcher:
     def get_raids(self, group) -> list:
         _list_new = [x for x in self.current_raids if x.get_time_left() > 0]          
         _list = [x for x in _list_new if x.group == group]    
-        self.current_raids = _list_new
+        self.current_raids = _list_new.copy()
+        _list = sorted(_list, key=lambda x: x.get_time_left())
         return _list
     
        
