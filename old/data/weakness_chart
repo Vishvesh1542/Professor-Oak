@@ -1,0 +1,20 @@
+{'bug': {'weak': ('rock', 'fire', 'flying',), 'resist': ('ground', 'grass', 'fighting',), 'immune': ()}
+, 'dark': {'weak': ('fairy', 'bug', 'fighting',), 'resist': ('ghost', 'dark',), 'immune': ('psychic',)}
+, 'dragon': {'weak': ('fairy', 'dragon', 'ice',), 'resist': ('electric', 'water', 'fire', 'grass',), 'immune': ()}
+, 'electric': {'weak': ('ground',), 'resist': ('steel', 'electric', 'flying',), 'immune': ()}
+, 'fairy': {'weak': ('poison', 'steel',), 'resist': ('bug', 'fighting', 'dark',), 'immune': ('dragon',)}
+, 'fighting': {'weak': ('fairy','psychic', 'flying',), 'resist': ('bug', 'rock', 'dark',), 'immune': ()}
+, 'fire': {'weak': ('ground', 'water', 'rock',), 'resist': ('bug', 'ice', 'fire', 'grass', 'steel', 'fairy',), 'immune': ()}
+, 'flying': {'weak': ('rock', 'electric', 'ice',), 'resist': ('grass', 'bug','fighting',), 'immune': ('ground',)}
+, 'ghost': {'weak': ('ghost', 'dark',), 'resist': ('poison', 'bug',), 'immune': ('fighting', 'normal',)}
+, 'grass': {'weak': ('bug', 'ice', 'flying', 'fire', 'poison',), 'resist': ('ground', 'water', 'grass', 'electric',), 'immune': ()}
+, 'ground': {'weak': ('water', 'grass', 'ice',), 'resist': ('poison', 'rock',), 'immune': ('electric',)}
+, 'ice': {'weak': ('rock', 'fighting', 'fire', 'steel',), 'resist': ('ice',), 'immune': ()}
+, 'normal': {'weak': ('fighting',), 'resist': ('ghost',), 'immune': ()}
+, 'poison': {'weak': ('ground', 'psychic',), 'resist': ('fighting', 'bug', 'grass', 'poison', 'fairy',), 'immune': ()}
+, 'psychic': {'weak': ('bug', 'ghost', 'dark',), 'resist': ('psychic', 'fighting',), 'immune': ()}
+, 'rock': {'weak': ('ground', 'fighting', 'water', 'grass', 'steel',), 'resist': ('poison', 'fire', 'normal', 'flying',), 'immune': ()}
+, 'steel': {'weak': ('ground', 'fire', 'fighting',), 'resist': ('psychic', 'normal', 'dragon', 'bug', 'flying', 'ice', 'grass', 'steel', 'fairy', 'rock',), 'immune': ('poison',)}
+, 'water': {'weak': ('electric', 'grass',), 'resist': ('ice', 'water', 'fire', 'steel',), 'immune': ()}
+, 'shadow': {'weak': (), 'resis': (), 'immune': ()}
+}
