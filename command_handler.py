@@ -18,6 +18,47 @@ class CommandHandler:
 
         self.add_commands_cog()
 
+    def add_command(self, name, description, function, 
+                    option_1=None, i_name=None, i_description=None,
+                    i_type=None, i_required=True, group=None):
+        
+        options = []
+        
+        if option_1:
+            options.append(Option(input_type=i_type, name=i_name,
+                                description=i_description,
+                                required=i_required))
+            
+        @commands.slash_command(name=name, description=description)
+        async def f(ctx, **kwargs):
+            function_kwargs = {'ctx': ctx}
+            for option in options:
+                function_kwargs[option.name] = kwargs.get(option.name)
+            function(**function_kwargs)
+            
+        self.commands[name] = {'description': description,
+                                'options': options, 'function': function}
+
+    async def send_message(self, ctx, message=None, embeds=None, paginator=None):
+        if message:
+            if isinstance(ctx, discord.Message):
+                await ctx.channel.send(message, reference=ctx)
+            else:
+                await ctx.respond(message)
+            return None
+        elif embeds:
+            if not paginator:
+                if isinstance(ctx, discord.Message):
+                    await ctx.channel.send(embed=embeds, reference=ctx)
+                else:
+                    await ctx.respond(embed=embeds)
+                return None
+            else:
+                if isinstance(ctx, discord.Message):
+                    await Paginator.send(ctx)
+                else:
+                    await paginator.respond(interaction=ctx.interaction)
+                return None
 
     def add_commands_cog(self):
         @commands.slash_command(name='start', description='Start making your life easier by being a part of Professor Oak.')
