@@ -41,4 +41,7 @@ class ProfessorOak(discord.Bot):
         embed.set_image(url='https://images.pokemonbot.com/assets/raid_eggs/2.png')
         await ctx.respond(embeds=[embed,])
 
-ProfessorOak(intents=intents).run("MTEwNTg2NzQ4NTkwNDkxNjUxMA.GpfYVI.pQ_xsIcT775iKfGndJUEbZpcicVgKTrSFS1ID0")
+with open('token') as f:
+    token = f.read()
+print(token)
+ProfessorOak(intents=intents).run(token)
