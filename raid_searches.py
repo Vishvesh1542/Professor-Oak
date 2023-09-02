@@ -14,7 +14,6 @@ async def get_raids(group: str = None) -> list:
     current_raids = []
     pop_items = []
     for server_id, info in raids.items():
-        print(server_id, info, info['start_time'] - time.time())
         if info['start_time'] - time.time() > 0:
             if group == info['group']:
                 current_raids.append({'info': info, 'id': server_id})
@@ -22,4 +21,5 @@ async def get_raids(group: str = None) -> list:
             pop_items.append(server_id)
     for i in pop_items:
         raids.pop(i)
+    print(current_raids)
     return current_raids

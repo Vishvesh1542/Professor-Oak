@@ -22,22 +22,49 @@ class CommandHandler:
                     option_1=None, i_name=None, i_description=None,
                     i_type=None, i_required=True, group=None):
         
-        options = []
-        
-        if option_1:
-            options.append(Option(input_type=i_type, name=i_name,
-                                description=i_description,
-                                required=i_required))
-            
-        @commands.slash_command(name=name, description=description)
-        async def f(ctx, **kwargs):
-            function_kwargs = {'ctx': ctx}
-            for option in options:
-                function_kwargs[option.name] = kwargs.get(option.name)
-            function(**function_kwargs)
-            
-        self.commands[name] = {'description': description,
-                                'options': options, 'function': function}
+        if not group:
+            if option_1:
+                if i_required:
+                    @commands.slash_command(name=name, description=description)
+                    async def f(ctx, x: Option(input_type=i_type, name=i_name,
+                                                    description=i_description,
+                                                    required=i_required)):
+                        await function(ctx, x)
+                    self.bot.add_application_command(f)
+                else:
+                    @commands.slash_command(name=name, description=description)
+                    async def f(ctx, x: Option(input_type=i_type, name=i_name,
+                                                    description=i_description,
+                                                    required=i_required)):
+                        await function(ctx, x)
+                    self.bot.add_application_command(f)
+            else:
+                @commands.slash_command(name=name, description=description)
+                async def f(ctx):
+                    function(ctx)
+                self.bot.add_application_command(f)
+            self.commands[name] = {'description': description,
+                                    'options': [], 'function': function}
+        else:
+            if option_1:
+                if i_required:
+                    @group.command(name=name, description=description)
+                    async def f(ctx, x: Option(input_type=i_type, name=i_name,
+                                                    description=i_description,
+                                                    required=i_required)):
+                        await function(ctx, x)
+                else:
+                    @group.command(name=name, description=description)
+                    async def f(ctx, x: Option(input_type=i_type, name=i_name,
+                                                    description=i_description,
+                                                    required=i_required)):
+                        await function(ctx, x)
+            else:
+                @group.command(name=name, description=description)
+                async def f(ctx):
+                    function(ctx)
+            self.commands[group.name + ' ' + name] = {'description': description,
+                                    'options': [], 'function': function}
 
     async def send_message(self, ctx, message=None, embeds=None, paginator=None):
         if message:
@@ -53,12 +80,13 @@ class CommandHandler:
                 else:
                     await ctx.respond(embed=embeds)
                 return None
+        elif paginator:
+            if isinstance(ctx, discord.Message):
+                await ctx.channel.send(
+                    embed = paginator.pages[0].embeds[0])
             else:
-                if isinstance(ctx, discord.Message):
-                    await Paginator.send(ctx)
-                else:
-                    await paginator.respond(interaction=ctx.interaction)
-                return None
+                await paginator.respond(interaction=ctx.interaction)
+            return None
 
     def add_commands_cog(self):
         @commands.slash_command(name='start', description='Start making your life easier by being a part of Professor Oak.')
@@ -67,33 +95,26 @@ class CommandHandler:
         self.commands['start'] = {'description': 
         'Start making your life easier by being a part of Professor Oak.',
                                  'options': [], 'function': self.c_start}
-        
-        @commands.slash_command(name='help', description='Get help on how to use Professor Oak.')
-        async def sc_help(ctx: discord.commands.ApplicationContext,
-                          page=Option(input_type=int, description='Page number.',
-                                      required=False)):
-            await self.c_help(ctx=ctx, command_parts=page)
-                    
-        self.commands['help'] = {'description': 
-        'get help on how to use Professor Oak.',
-                                 'options': [], 'function': self.c_help}
 
+        self.add_command('help', 'Get help on how to use Professor Oak.',
+                         self.c_help, True, 'page', 'Page number.', int, False)
 
         raid = discord.SlashCommandGroup('raid', 'Commands related to the "raids" feature of Pokemon')
-
-        @raid.command(name='meta', description='Get the best raid counters for any Pokemon!',)
-        async def sc_raid_meta(ctx, pokemon: Option(str,
-                description='The Pokemon whose counters you want to get!', required=True)):
-            await self.c_raid_pokemon(ctx, pokemon) 
-                
-        self.commands['raid meta'] = {'description': 
-        'Get the best raid counters for any Pokemon!',
-                                 'options': [], 'function': self.c_raid_pokemon}
-
+        self.add_command('meta', 'Get the best raid counters for any Pokemon!', self.c_raid_pokemon
+                        , True, 'pokemon', 'Pokemon whose counters you want to get!',
+                        str, True, group=raid)
+        self.add_command('search', 'Find out ongoing raids!', self.c_raid_search,
+                         True, 'group', 'group whose raids you want to get.',
+                         str, False, raid)
+        
+        server = discord.SlashCommandGroup('server', 'commands related to managing this server')
+        self.add_command('make_public', 'Makes this server public for others to join raids.',
+                         self.c_make_public, True, 'group',
+                           'the group you want to add this server to', str, True, server)
 
         self.bot.add_application_command(sc_start)
-        self.bot.add_application_command(sc_help)
         self.bot.add_application_command(raid)
+        self.bot.add_application_command(server)
 
     async def c_start_slash(self, ctx: discord.commands.ApplicationContext, command_parts: tuple=None):
         response = user_handler.add_user(name=ctx.user.name, user_id=ctx.user.id,
@@ -114,7 +135,6 @@ class CommandHandler:
         await ctx.channel.send('Successfully added user!', reference=ctx)
 
     async def c_help(self, ctx, command_parts: tuple =  None):  
-        print(command_parts)
         if command_parts is None or command_parts == [] or isinstance(command_parts, Option):
             embed = discord.Embed(title='Help', color=random.choice(color_list))
             embed.description = "**Professor Oak can be used for many things**.\n\
@@ -128,11 +148,7 @@ But there is a lot more to learn about Professor Oak. And you can learn them in 
 ```Page 4: More info```\
 "
             embed.set_footer(text="Search next pages using .help {page} or /help {page}")
-            if isinstance(ctx, discord.Message):
-                await ctx.channel.send(embed=embed, reference=ctx)
-            else:
-                await ctx.respond(embed=embed)
-            return None
+            await self.send_message(ctx=ctx, embeds=embed)
         else:
             page = command_parts if command_parts is str else command_parts[0]
             if isinstance(page, str) and not page.isdigit():
@@ -144,55 +160,47 @@ But there is a lot more to learn about Professor Oak. And you can learn them in 
             page = int(page)
             page_2 = discord.Embed(title='Setting up your server for showing it in `/raid search`')
             page_2.description = "It is very simple. Just go to the server you want to make public and type `/server make_public`.\
-        Keep in mind that you need the ownership of the server."
+Keep in mind that you need the ownership of the server."
 
             page_3 = discord.Embed(title='How to make servers which only I can access.')
             page_3.description = "Not every one can do this. This is only given to owners of reasonably \
-    big communites who can benifit from the servers. This is \
-    **Completely Free**. All you need to do is contact `known_as_agent` and you will be granted premiumship if you intend on helping \
-    others. \
-    ```How to actually make the server?```\
-    You can create server groups, using `/group create {key} or .group create{key}`. remember the key as you will use that to access \
-    all the servers in that group.\
-    ```What do I do to add my server to that group?```\
-    After you have made the group, you can easily add a server to that group with `/group add {key} or .group add {key}`\
-    Currently, a server can only be in one group at a time.\
-    You need the ownership of the server to add it to the group."
+big communites who can benifit from the servers. This is \
+**Completely Free**. All you need to do is contact `known_as_agent` and you will be granted premiumship if you intend on helping \
+others. \
+```How to actually make the server?```\
+You can create server groups, using `/group create {key} or .group create{key}`. remember the key as you will use that to access \
+all the servers in that group.\
+```What do I do to add my server to that group?```\
+After you have made the group, you can easily add a server to that group with `/group add {key} or .group add {key}`\
+Currently, a server can only be in one group at a time.\
+You need the ownership of the server to add it to the group."
 
             page_4 = discord.Embed(title="How to hide my server again from `/raid search`")
             page_4.description = "It is very easy to hide a public server. Just use `/server remove_public or .server remove_public` \
-    You need ownership. This also works if the server is in a private group. It removes the \
-    server from that group. You can use this method to change the group of a server."
+You need ownership. This also works if the server is in a private group. It removes the \
+server from that group. You can use this method to change the group of a server."
 
             page_5 = discord.Embed(title='It all sounded like greek and latin')
             page_5.description = "Sorry to hear that, I am not a professional you see. \
-        Any doubts you have or any suggestions can be asked in the (Un)official server.\
-        Alternatively, you can DM me `known_as_agent`. I will be more than happy to clarify \
-        doubts"
-            
+Any doubts you have or any suggestions can be asked in the (Un)official server.\
+Alternatively, you can DM me `known_as_agent`. I will be more than happy to clarify \
+doubts"
+    
             pages = [page_2, page_3, page_4, page_5]
             correct_page = page-1
             try:
-                if isinstance(ctx, discord.Message):
-                    await ctx.channel.send(embed=pages[correct_page], reference=ctx)
-                else:
-                    await ctx.respond(embed=pages[correct_page])
+                await self.send_message(ctx, embeds=pages[correct_page])
             except IndexError:
-                if isinstance(ctx, discord.Message):
-                    await ctx.channel.send('Invalid Page!', reference=ctx)
-                else:
-                    await ctx.respond('Invalid Page!')
-                return None
+                await self.send_message(ctx, 'Invalid page!')
 
     async def c_raid_search(self, ctx, group: str = None):
-        raids_ = raid_searches.get_raids(group)
+        if not group:
+            group=None
+        raids_ = await raid_searches.get_raids(group)
         if not raids_:
-            if isinstance(ctx, discord.Message):
-                await ctx.channel.send('Sorry, no raids found!', reference=ctx)
-            else:
-                await ctx.respond('Sorry, no raids found!')
+            await self.send_message(ctx, 'Sorry, no raids found.')
             return None
-        raids_into_pages = [raids_[i: i:10] for i in range(0, len(raids_), 10)]
+        raids_into_pages = [raids_[i: i+10] for i in range(0, len(raids_), 10)]
 
         pages = []
         title = 'Ongoing raids:' if not group  else f'Ongoing raids for group {group}'
@@ -200,19 +208,17 @@ But there is a lot more to learn about Professor Oak. And you can learn them in 
             embed = discord.Embed(title=title,
                                   color=random.choice(color_list))
             for raid in page_data:
-                string = ''
-                string += '⭐' * int(raid['info']['stars']) 
-                string.ljust(5)
-                string += raid['info']['boss']
+                string = raid['info']['stars']
+                string = string.ljust(10, "\u00a0")
 
-                time_left_seconds = raid['info']['start_time'] - time.time()
-                minutes = time_left_seconds // 60
+                seconds = raid['info']['start_time'] - time.time()
+                minutes = int(seconds // 60)
                 seconds %= 60
-                hours = minutes // 60
+                hours = int(minutes // 60)
                 minutes %= 60
-
-                embed.add_field(name=string, value=f'time left: {hours} : {minutes} : {seconds}'.ljust(15) 
-                                + str(raid['info']['raid_id']))
+                seconds = int(seconds)
+                string += f'{hours}:{minutes}:{seconds}'
+                embed.add_field(name=string, value=f'{raid["info"]["raid_id"]}'.ljust(15, '\u00a0') + f" | {raid['info']['boss']}")
             pg = Page(embeds=[embed,])
             pages.append(pg)
         pgnator = Paginator(pages)
@@ -223,6 +229,9 @@ But there is a lot more to learn about Professor Oak. And you can learn them in 
             await pgnator.respond(interaction=ctx.interaction)
         return None
 
+    async def c_make_public(self, ctx, group: str=None):
+        await self.send_message(ctx, str(group))
+
     async def func_process_raid(self, message) -> None:
         # if message.guild.id in user_handler.get_servers():
             embed = message.embeds
@@ -231,7 +240,7 @@ But there is a lot more to learn about Professor Oak. And you can learn them in 
             raid_boss = description.split('**Raid Boss :**')[1].split('\n')[0].strip()
             stars = description.split('**Raid Stars :**')[1].split('\n')[0].strip()
             time_until_raid = description.split('A new raid will start in')[1].split('.')[0].strip()
-            raid_id = '-'
+            raid_id = '0'
 
             if 'Raid ID' in description:
                 raid_id = description.split('**Raid ID :**')[1].split('\n')[0].strip()
@@ -253,7 +262,6 @@ But there is a lot more to learn about Professor Oak. And you can learn them in 
                                    boss= raid_boss, stars = stars, group=group, raid_id=raid_id)
                                    
     async def c_raid_pokemon(self, ctx, command_parts: tuple):
-        print(command_parts)
         if command_parts is None or command_parts == []:
             await ctx.channel.send('No Pokemon given!', reference=ctx)
             return 
@@ -264,14 +272,10 @@ But there is a lot more to learn about Professor Oak. And you can learn them in 
             c = ''.join(command_parts)
         embed = await raids.get_meta(c)
 
-        if isinstance(ctx, discord.Message):
-            await ctx.channel.send(embed=embed.pages[0].embeds[0], reference=ctx)
+        if isinstance(embed, Paginator):
+            await self.send_message(ctx,paginator=embed)
         else:
-            if isinstance(embed, Paginator):
-                await embed.respond(interaction=ctx.interaction)
-            else:
-                await ctx.respond(embeds=[embed,])
-        return None
+            await self.send_message(ctx, embeds=embed)
 
     async def process_message(self, message: discord.message.Message):
                                    # Professor Oak's
@@ -284,6 +288,7 @@ But there is a lot more to learn about Professor Oak. And you can learn them in 
             return None
 
         command_parts = message.content[1:].split(' ')
+
         command_name = command_parts[0]
         if command_name not in self.commands:
             try:

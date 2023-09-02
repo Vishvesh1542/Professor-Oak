@@ -35,7 +35,7 @@ class ProfessorOak(discord.Bot):
     async def test(ctx: discord.context.ApplicationContext):
         embed = discord.Embed(title='⚔️ Raid Announcement ⚔️')
         embed.description = 'Hello trainers ! A new raid will start in 1 hour. Here are the details about the raid.\n\
-    **Raid Boss :** ?\n \
+    **Raid Boss :** Mega Shadow Mewtwo x\n \
     **Raid Stars :** ⭐⭐\n\
     **Start Time :** <t:1683041467:f> UTC'
         embed.set_image(url='https://images.pokemonbot.com/assets/raid_eggs/2.png')

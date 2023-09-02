@@ -83,17 +83,18 @@ async def get_stats(pokemon: dict, level: int, arguments: dict) -> dict:
 
     for argument, value in arguments.items():
         argument = argument.lower()
-        if 'iv' in argument:
-            stat = argument.replace('iv', '')
-            iv[stat] = int(value)
-        elif 'ev' in argument:
-            stat = argument.replace('ev', '')
-            ev[stat] = int(value)
-        elif argument == 'evtrained':
+        if argument == 'evtrained':
             ev = {stat: 252 for stat in ev}
         elif argument == 'godtier':
             iv.update({'hp': 31, 'atk': 31, 'spatk': 31, 'def': 26, 'spdef': 26, 'speed': 20})
 
+        elif 'iv' == argument:
+            stat = argument.replace('iv', '')
+            iv[stat] = int(value)
+        elif 'ev' == argument:
+            stat = argument.replace('ev', '')
+            ev[stat] = int(value)
+       
     stats = pokemon.copy()
     for stat in ['hp', 'atk', 'def', 'spatk', 'spdef', 'speed']:
         stats[stat] = int(((iv[stat] + (2 * int(pokemon[stat])) + (ev[stat] / 4) + 100) * level) / 100 + 10)
@@ -175,8 +176,6 @@ async def valid_pokemon(pokemon_name: str) -> bool:
 
 async def valid_arguments(arguments: dict) -> bool:
     ALLOWED_ARGUMENTS_RESTRICTED = ['level', 'evtrained', 'godtier']
-    ALLOWED_ARGUMENTS_DETAILED = ['level', 'evtrained', 'godtier', 'hpiv', 'hpev', 'atkiv', 'etkev', 'defiv', 'defev', 'spatkiv', 'spatkev'
-                                  , 'spdefiv', 'spdefev', 'speediv', 'speedev', 'nature']
     async for argument in AsyncList(list(arguments.keys())):
         if argument.strip().lower() not in ALLOWED_ARGUMENTS_RESTRICTED:
             return False

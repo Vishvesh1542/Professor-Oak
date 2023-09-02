@@ -21,10 +21,25 @@ def add_user(name: str, user_id: int, type_: str, credits: int):
 def get_servers(user = None):
     if user:
         raise NotImplementedError('Lazy implement this')
-        return
     
     server_list = [key for user in users for key in user['servers']]
     return server_list
+
+def add_server(user_id: int, server_id):
+    if int(user_id) not in users:
+        return False
+    users[str(user_id)]['servers'][str(server_id)] = {'group': None}
+
+def set_group(guild_id: int, group: str):
+    for u in users:
+        if not guild_id in u['servers']:
+            continue
+        if group == 'None':
+            u['servers'][str(guild_id)]['group'] = None
+            return
+        else:
+            u['servers'][str(guild_id)]['group'] = group
+            return
 
 def get_group(guild_id: int) -> str | None:
     return next((data['server'][guild_id]['group'] for user, data
