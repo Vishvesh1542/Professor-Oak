@@ -16,10 +16,6 @@ class ProfessorOak(discord.Bot):
         self.add_application_command(self.test)
 
     async def on_ready(self):
-        user_handler.load()
-        raids.load()
-        help.load()
-        raid_searches.init()
         print(' [ INFO ]'.ljust(15) + f'Logged in as {self.user}')
 
     async def on_message(self, message):
@@ -27,24 +23,28 @@ class ProfessorOak(discord.Bot):
         #     return
 
         await self.commands_manager.process_message(message)
-    
-    
+
     @commands.slash_command(
         name='test',
-        description='If u can see this u are hacking',
-        scope=1084731374344359966,
+        description='If u can see this u are hacking'
     )
-    async def test(ctx: discord.context.ApplicationContext):
+    async def test(ctx):
         embed = discord.Embed(title='⚔️ Raid Announcement ⚔️')
         embed.description = 'Hello trainers ! A new raid will start in 1 hour. Here are the details about the raid.\n\
-    **Raid Boss :** Mega Shadow Mewtwo x\n \
+    **Raid Boss :** ?\n \
     **Raid Stars :** ⭐⭐\n\
-    **Raid ID :** 100\n\
     **Start Time :** <t:1683041467:f> UTC'
         embed.set_image(url='https://images.pokemonbot.com/assets/raid_eggs/2.png')
-        await ctx.respond(embeds=[embed,])
+        await ctx.send(embeds=[embed,])
+    
 
 with open('token') as f:
     token = f.read()
-print(' [ INFO ].ljust(15) TOKEN: ' + token)
+print(' [ INFO ] '.ljust(15) + token)
+user_handler.load()
+raids.load()
+help.load()
+raid_searches.init()
+
+
 ProfessorOak(intents=intents).run(token)

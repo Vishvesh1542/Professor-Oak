@@ -434,7 +434,9 @@ class CommandHandler:
     async def process_message(self, message: discord.message.Message):
                                    # Professor Oak's
         if message.author.id == 1105867485904916510:
+            print('f')
             if message.embeds:
+                print('f', message.embeds[0].title)
                 if message.embeds[0].title == "⚔️ Raid Announcement ⚔️":
                     await self.func_process_raid(message)
 
