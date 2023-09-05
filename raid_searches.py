@@ -21,7 +21,7 @@ async def get_raids(group: str = None) -> list:
             pop_items.append(server_id)
     for i in pop_items:
         raids.pop(i)
-    print(' [ INFO ]'.ljust(15) + current_raids)
+    print(' [ INFO ]'.ljust(15) + 'Current Raids: ' + str(current_raids))
     return current_raids
 
 async def from_id(group_id: int):

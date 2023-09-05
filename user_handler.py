@@ -14,10 +14,10 @@ def load() -> None:
 
 def sync():
     with open(r'data/users.json', 'w') as file:
-        json.dump(users, file)
+        json.dump(users, file, indent=4)
 
     with open(r'data/groups.json', 'w') as file:
-        json.dump(groups, file)
+        json.dump(groups, file, indent=4)
 
 def add_user(name: str, user_id: int, type_: str, credits: int):
     if str(user_id) in users.keys():
@@ -36,8 +36,13 @@ def set_type(user_id, type_: str):
 def get_servers(user = None):
     if user:
         raise NotImplementedError('Lazy implement this')
-    
-    server_list = [key for user in users for key in user['servers']]
+
+    server_list = []
+    for uname, user in users.items():
+        for server in user['servers']:
+            server_list.append(server)
+
+    # server_list = [key for user in users for key in user['servers']]
     return server_list
 
 def add_server(user_id: int, server_id):
@@ -79,17 +84,23 @@ def add_group(group_name: str, creator_id: int):
 
 def get_group(guild_id: int) -> str | None:
     servers = [x['servers'] for x in users.values()]
+    # Create a new dictionary to store the restructured data
+    fixed_data = {}
 
-    if all(item == {} for item in servers):
-        return 404
+    # Iterate through the list of dictionaries
+    for dictionary in servers:
+        # Iterate through the nested dictionaries within each dictionary
+        for key, value in dictionary.items():
+            # Update the fixed_data dictionary with the nested structure
+            fixed_data[key] = value
 
-    for server in servers:
-        if not server:
+    for key in fixed_data:
+        if not key:
             continue
 
-        elif list(server.keys())[0] == str(guild_id):
+        if key == str(guild_id):
             pass
-            return server[str(guild_id)]['group']
+            return fixed_data[str(guild_id)]['group']
     return 404
 
 def get_user(user_id: int):

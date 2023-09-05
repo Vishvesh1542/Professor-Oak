@@ -338,9 +338,6 @@ class CommandHandler:
         if group == 404:
             await self.send_message(ctx, 'This server is not public.')
             return
-        elif not group:
-            await self.send_message(ctx, 'This server is not in any group.')
-            return
         await self.send_message(ctx, 'This server is in group: `' + str(group) + '`')
 
     async def c_group_create(self, ctx, group=str):
@@ -387,7 +384,7 @@ class CommandHandler:
             await self.send_message(ctx, f'Successfully gave premium to user @{user}')
 
     async def func_process_raid(self, message) -> None:
-        # if message.guild.id in user_handler.get_servers():
+        if str(message.guild.id) in user_handler.get_servers():
             embed = message.embeds
             description = embed[0].description
             
@@ -411,7 +408,7 @@ class CommandHandler:
                 time_left = 300
 
             group = user_handler.get_group(message.guild.id)
-
+            print(' [ INFO ]'.ljust(15) + 'Adding raid  ' + raid_boss)
             raid_searches.add_raid(server=message.guild.id, start_time=time.time() + time_left,
                                    boss= raid_boss, stars = stars, group=group, raid_id=raid_id)
                                    
@@ -432,11 +429,9 @@ class CommandHandler:
             await self.send_message(ctx, embeds=embed)
 
     async def process_message(self, message: discord.message.Message):
-                                   # Professor Oak's
-        if message.author.id == 1105867485904916510:
-            print('f')
+                                #    Pokemon's
+        if message.author.id == 669228505128501258:
             if message.embeds:
-                print('f', message.embeds[0].title)
                 if message.embeds[0].title == "⚔️ Raid Announcement ⚔️":
                     await self.func_process_raid(message)
 
