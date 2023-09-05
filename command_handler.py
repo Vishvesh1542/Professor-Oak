@@ -175,64 +175,6 @@ class CommandHandler:
         embed = help.get_page(page)
         await self.send_message(ctx, embeds=embed)
 
-#         if command_parts is None or command_parts == [] or isinstance(command_parts, Option):
-#             embed = discord.Embed(title='Help', color=random.choice(color_list))
-#             embed.description = "**Professor Oak can be used for many things**.\n\
-# `1. You can get the best pokemon counter for any pokemon. Just use` ``` `/raid meta {pokemon} or .raid meta` ``` \n\
-# `2. You can search on-going raids using` ```/raid search or .raid search``` \n \
-# `3. And then easily joining those servers using ` ```/server join {id} or .server join {id}```\n\n\
-# But there is a lot more to learn about Professor Oak. And you can learn them in the next pages.\n\
-# ```Page 1: Setting up your server for showing it in `/raid search or .raid search` ```\
-# ```Page 2: How to make servers which only I can access?```\
-# ```Page 3: How to hide my serv  er again from `/raid search`?```\
-# ```Page 4: More info```\
-# "
-#             embed.set_footer(text="Search next pages using .help {page} or /help {page}")
-#             await self.send_message(ctx=ctx, embeds=embed)
-#         else:
-#             page = command_parts if command_parts is str else command_parts[0]
-#             if isinstance(page, str) and not page.isdigit():
-#                 if isinstance(ctx, discord.Message):
-#                     await ctx.channel.send('Invalid page!', reference=ctx)
-#                 else:
-#                     await ctx.respond("Invalid Page!")
-#                 return None
-#             page = int(page)
-#             page_2 = discord.Embed(title='Setting up your server for showing it in `/raid search`')
-#             page_2.description = "It is very simple. Just go to the server you want to make public and type `/server make_public`.\
-# Keep in mind that you need the ownership of the server."
-
-#             page_3 = discord.Embed(title='How to make servers which only I can access.')
-#             page_3.description = "Not every one can do this. This is only given to owners of reasonably \
-# big communites who can benifit from the servers. This is \
-# **Completely Free**. All you need to do is contact `known_as_agent` and you will be granted premiumship if you intend on helping \
-# others. \
-# ```How to actually make the server?```\
-# You can create server groups, using `/group create {key} or .group create{key}`. remember the key as you will use that to access \
-# all the servers in that group.\
-# ```What do I do to add my server to that group?```\
-# After you have made the group, you can easily add a server to that group with `/group add {key} or .group add {key}`\
-# Currently, a server can only be in one group at a time.\
-# You need the ownership of the server to add it to the group."
-
-#             page_4 = discord.Embed(title="How to hide my server again from `/raid search`")
-#             page_4.description = "It is very easy to hide a public server. Just use `/server remove_public or .server remove_public` \
-# You need ownership. This also works if the server is in a private group. It removes the \
-# server from that group. You can use this method to change the group of a server."
-
-#             page_5 = discord.Embed(title='It all sounded like greek and latin')
-#             page_5.description = "Sorry to hear that, I am not a professional you see. \
-# Any doubts you have or any suggestions can be asked in the (Un)official server.\
-# Alternatively, you can DM me `known_as_agent`. I will be more than happy to clarify \
-# doubts"
-    
-            # pages = [page_2, page_3, page_4, page_5]
-            # correct_page = page-1
-            # try:
-            #     await self.send_message(ctx, embeds=pages[correct_page])
-            # except IndexError:
-            #     await self.send_message(ctx, 'Invalid page!')
-
     async def c_raid_search(self, ctx, group: str = None):
         if not group:
             group=None
@@ -392,7 +334,6 @@ class CommandHandler:
                 return
 
         group = user_handler.get_group(ctx.guild.id)
-        print(group)
 
         if group == 404:
             await self.send_message(ctx, 'This server is not public.')

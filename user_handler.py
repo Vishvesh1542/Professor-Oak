@@ -44,7 +44,6 @@ def add_server(user_id: int, server_id):
     if str(user_id) not in users:
         return False
     users[str(user_id)]['servers'][str(server_id)] = {'group': None}
-    print(users[str(user_id)]['servers'])
     sync()
     return True
 
@@ -55,7 +54,6 @@ def remove_server(user_id: int, server_id: int):
         users[str(user_id)]['servers'].pop(str(server_id))
     except KeyError:
         return 404
-    print(users[str(user_id)]['servers'])
     sync()
     return True
 
@@ -85,7 +83,6 @@ def get_group(guild_id: int) -> str | None:
     if all(item == {} for item in servers):
         return 404
 
-    print(servers)
     for server in servers:
         if not server:
             continue
@@ -93,7 +90,6 @@ def get_group(guild_id: int) -> str | None:
         elif list(server.keys())[0] == str(guild_id):
             pass
             return server[str(guild_id)]['group']
-    print(404)
     return 404
 
 def get_user(user_id: int):

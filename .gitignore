@@ -7,6 +7,8 @@ __pycache__/
 *.so
 
 token
+data/groups.json
+users.json
 
 # Distribution / packaging
 .Python

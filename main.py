@@ -29,5 +29,5 @@ class ProfessorOak(discord.Bot):
 
 with open('token') as f:
     token = f.read()
-print(' [ INFO ].ljust(15) TOKEN: ' + token)
+print(' [ INFO ] '.ljust(15) + token)
 ProfessorOak(intents=intents).run(token)
