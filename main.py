@@ -4,6 +4,7 @@ from discord.ext import commands
 import user_handler
 import raids
 import raid_searches
+import help
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -17,6 +18,7 @@ class ProfessorOak(discord.Bot):
     async def on_ready(self):
         user_handler.load()
         raids.load()
+        help.load()
         raid_searches.init()
         print(' [ INFO ]'.ljust(15) + f'Logged in as {self.user}')
 
@@ -37,6 +39,7 @@ class ProfessorOak(discord.Bot):
         embed.description = 'Hello trainers ! A new raid will start in 1 hour. Here are the details about the raid.\n\
     **Raid Boss :** Mega Shadow Mewtwo x\n \
     **Raid Stars :** ⭐⭐\n\
+    **Raid ID :** 100\n\
     **Start Time :** <t:1683041467:f> UTC'
         embed.set_image(url='https://images.pokemonbot.com/assets/raid_eggs/2.png')
         await ctx.respond(embeds=[embed,])

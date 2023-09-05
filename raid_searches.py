@@ -23,3 +23,9 @@ async def get_raids(group: str = None) -> list:
         raids.pop(i)
     print(current_raids)
     return current_raids
+
+async def from_id(group_id: int):
+    for server_id, info in raids.items():
+        if info['raid_id'] == str(group_id):
+            return server_id
+    return None
