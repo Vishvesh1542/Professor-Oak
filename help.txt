@@ -1,0 +1,169 @@
+Hello trainers!
+I am professor Oak.
+I can instantly tell the counter to any pokemon
+And search entire discord for you!
+You can use me for 2 things mainly:
+```1. Search the best pokemon counter for any pokemon```
+```2. Search different servers for raids and easily join them```
+The upcoming pages introduce you to these concepts:
+```
+1. Searching the best pokemon counter.
+2. Searching different servers for raids.
+3. Setting up your server to search for raids.
+4. Removing your server to search for raids.
+5. Creating groups to organise your servers.
+6. Adding your server to groups.
+7. Joining the required server to do a raid.
+```
+#footer#
+you can search for these pages using /help {page}
+#footer#
+
+#page#
+
+It can be quite hard for you to instantly tell
+which pokemon to use for which raid.
+That is where I come in!
+With one command you can instantly get the best
+pokemon counters for any pokemon!
+You can use `.raid meta {pokemon}` or `/raid meta {pokemon}`
+replacing the {pokemon} with the pokemon's name.
+
+An example would be:
+```
+.raid meta pikachu
+/raid meta pikachu```
+
+#footer#
+**Protip:** to specify that your pokemon is ev trained,
+you can use --godtier after the pokemon's name.
+like: `.raid meta pikachu --godtier`
+#footer#
+
+#page#
+
+I know how annoying it is to search for raids
+during global times. That is where I come in!
+Instantly search through hundreds of raids
+by using my command:
+```
+/raid search
+.raid Search
+```
+Do you know of some ~secret~ group code which allows access
+to servers which the typical raid search command does not show?
+you can type the group code after the command like:
+```
+/raid search {group}
+.raid search {group}
+```
+Learn more about the group in `page 5`
+
+#page#
+
+My `/raid search` command works by checking 
+every server I am in to see if there is a raid.
+But not all the servers I am in like others to join
+their raids. So by default I do not search for raids.
+But if you want to contribute and help others also 
+join raids, you can enable searching for raids 
+in this server by using my commands:
+```
+/server make_public 
+.server make_public
+```
+Optionally, you can also add this server 
+directly to a group by specifying the group name
+after the command like this:
+```
+/server make_public {group}
+.server make_public {group}
+```
+Learn more about groups in `page 5`
+
+#footer#
+**Note:** Professor Oak reads the messages in public
+servers to find a raid. So making this server public
+allows Professor Oak to read messages in this server.
+None of the messages are stored.
+#footer#
+
+#page#
+To remove a server from raids, it is very easy.
+You just have to type one command.
+
+```
+/server remove_public
+.server remove_public
+```
+This also removes the server from any groups if it 
+is a part of one.
+Please do not hide a server as it helps others
+find raids. Imagine if you do not find a raid
+when you need one? Always try to help others.
+
+#page#
+
+Groups are a way to organise (and hide) your servers.
+When you add a server to a group, it is not accessible
+by just typing `/raid search`. But instead requires
+a special name of the group to access it. like:
+```
+/raid search {group}
+.raid search {group}
+```
+
+To make a group, all you have to do is 
+```
+/group new {group name}
+.group new {group_name}
+```
+**Note** that only select people can create groups.
+To get the permission to create groups, contact
+`known_as_agent`.
+
+#page#
+
+There are two ways add a server to a group,
+one is to add it when making the server public,
+like:
+```
+/server make_public {group}
+.server make_public {group}
+```
+or if you server is already public you can change
+its group using:
+```
+/server change_group {group}
+.server change_group {group}
+```
+To check the group your server is in,
+you can use:
+```
+/server get_group
+.server get_group
+```
+
+#page#
+When you do raid search, 
+you are presented with a list of raids from
+different servers which show information 
+like the raid stars, raid boss, time left
+before the raid starts and the raid_id.
+
+You can easily join the server the raid is going
+on by using:
+```
+/server join {raid_id}
+.server join {raid_id}
+```
+This creates an invite to that server
+and sends it to you.
+This invite is only temporary and you will be
+removed from the server as soon you log out.
+
+#footer#
+**Note:** the create_invites permission is required 
+to make invites to the server. This is why Professor
+Oak requires create_invites permission when adding it to a server.
+#footer#
