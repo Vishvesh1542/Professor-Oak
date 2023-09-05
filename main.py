@@ -13,6 +13,7 @@ class ProfessorOak(discord.Bot):
     def __init__(self, description=None, *args, **options):
         super().__init__(description, *args, **options)
         self.commands_manager = CommandHandler(self)
+        self.add_application_command(self.test)
 
     async def on_ready(self):
         user_handler.load()
@@ -22,12 +23,28 @@ class ProfessorOak(discord.Bot):
         print(' [ INFO ]'.ljust(15) + f'Logged in as {self.user}')
 
     async def on_message(self, message):
-        if message.author == self.user:
-            return
+        # if message.author == self.user:
+        #     return
 
         await self.commands_manager.process_message(message)
+    
+    
+    @commands.slash_command(
+        name='test',
+        description='If u can see this u are hacking',
+        scope=1084731374344359966,
+    )
+    async def test(ctx: discord.context.ApplicationContext):
+        embed = discord.Embed(title='⚔️ Raid Announcement ⚔️')
+        embed.description = 'Hello trainers ! A new raid will start in 1 hour. Here are the details about the raid.\n\
+    **Raid Boss :** Mega Shadow Mewtwo x\n \
+    **Raid Stars :** ⭐⭐\n\
+    **Raid ID :** 100\n\
+    **Start Time :** <t:1683041467:f> UTC'
+        embed.set_image(url='https://images.pokemonbot.com/assets/raid_eggs/2.png')
+        await ctx.respond(embeds=[embed,])
 
 with open('token') as f:
     token = f.read()
-print(' [ INFO ] '.ljust(15) + token)
+print(' [ INFO ].ljust(15) TOKEN: ' + token)
 ProfessorOak(intents=intents).run(token)
