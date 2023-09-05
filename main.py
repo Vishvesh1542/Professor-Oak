@@ -13,7 +13,6 @@ class ProfessorOak(discord.Bot):
     def __init__(self, description=None, *args, **options):
         super().__init__(description, *args, **options)
         self.commands_manager = CommandHandler(self)
-        self.add_application_command(self.test)
 
     async def on_ready(self):
         user_handler.load()
