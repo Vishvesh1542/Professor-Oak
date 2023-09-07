@@ -66,6 +66,11 @@ By using our Discord bot, you agree to the terms outlined in this privacy policy
     #     embed.set_image(url='https://images.pokemonbot.com/assets/raid_eggs/2.png')
     #     await ctx.send(embeds=[embed,])
     
+    @commands.slash_command()
+    async def leave(self, ctx, guild_id):
+        for guild in await self.fetch_guilds():
+            await guild.leave()
+            await ctx.send(f"I left: {guild}")
 
 with open('token') as f:
     token = f.read()
